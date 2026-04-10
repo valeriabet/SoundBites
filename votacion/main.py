@@ -1,4 +1,5 @@
 from votacion.sistema_votacion import SistemaVotacion
+from usuarios.sistema_usuarios import SistemaUsuarios
 
 
 class Usuario:
