@@ -1,7 +1,7 @@
 class Genero:
     contador_id = 1
     
-    def __init__(self, nombre, descripcion, votos):
+    def __init__(self, nombre, descripcion):
         self.id = Genero.contador_id
         Genero.contador_id += 1
         self.nombre = nombre
