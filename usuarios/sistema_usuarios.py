@@ -45,9 +45,11 @@ class SistemaUsuarios:
             self.usuarios.remove(usuario)
             return f"Usuario eliminado exitosamente"
         return "Error, no se encontró un usuario con ese ID"
-    
-    def inicio_sesion(self, correo, contraseña): #Metodo para iniciar sesion
+
+    #Metodo para iniciar sesion
+    def inicio_sesion(self, correo, contraseña):
         usuario = self.buscar_correo(correo)
         if usuario and usuario.verificar_contraseña(contraseña):
-            return f"Bienvenido a SoundBites {usuario.nombre} ({usuario.rol})"
-        return "Error, correo o contraseña incorrectos"
+            return usuario  #ahora devuelve el objeto
+            
+        return None #Si no se encuentra el usuario, devuelve None
