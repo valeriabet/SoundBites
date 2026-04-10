@@ -1,7 +1,7 @@
 from sistema_usuarios import SistemaUsuarios #Importacion de sistema de usuarios
 
 sistema_usuarios = SistemaUsuarios() #Instancia del sistema de usuarios
-
+usuario_actual = None #Variable para almacenar el usuario actual
 while True: #Menu de opciones para el usuario
     print("\n Usuarios")
     print("1. Registrar Usuario")
@@ -34,8 +34,13 @@ while True: #Menu de opciones para el usuario
     elif opcion == "4":
         correo = input("Correo: ")
         contraseña = input("Contraseña: ")
-        resultado = sistema_usuarios.inicio_sesion(correo, contraseña)
-        print(resultado)
+        usuario = sistema_usuarios.inicio_sesion(correo, contraseña)
+        
+        if usuario:
+            usuario_actual = usuario
+            print(f"Bienvenido {usuario.nombre} ({usuario.rol})")
+        else:
+            print("Error, correo o contraseña incorrectos")
         
     elif opcion == "5":
         correo = input("Correo: ")
@@ -59,3 +64,8 @@ while True: #Menu de opciones para el usuario
 
     else:
         print("Opción no válida, por favor intente nuevamente.")
+
+        
+
+def obtener_usuario_actual(): #Metodo para obtener el usuario actual
+    return usuario_actual #Devuelve el usuario actual
