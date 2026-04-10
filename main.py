@@ -1,18 +1,13 @@
-    from servicios.sistema_usuarios import SistemaUsuarios
-
+#imports
+from votacion.sistema_votacion import SistemaVotacion
+from main_usuarios import obtener_usuario_actual 
+import main_usuarios
+import importlib #Importa el modulo importlib
+import main_votacion
+from usuarios.sistema_usuarios import SistemaUsuarios
 # ===== INSTANCIA =====
 sistema_usuarios = SistemaUsuarios()
-
-# ===== FUNCIONES USUARIOS =====
-
-
-
-
-# ===== SUBMENÚ USUARIOS =====
-
-
-
-
+sistema_votacion = SistemaVotacion()
 # ===== SUBMENÚ PLATOS (BASE) =====
 
 def menu_platos():
@@ -57,16 +52,20 @@ def menu():
     while True:
         print("\n===== SISTEMA RESTAURANTE =====")
         print("1. Gestión de usuarios")
-        print("2. Gestión de platos")
-        print("3. Gestión de categorías")
+        print("2. Votar")
+        print("3. Ver resultados")
+        print("4. Gestión de platos")
+        print("5. Gestión de categorías")
         print("0. Salir")
 
         opcion = input("Seleccione una opción: ")
 
-        if opcion == "1":
-            menu_usuarios()
+     if opcion == "1":
+        
+        importlib.reload(main_usuarios) #Recarga el modulo main_usuarios
+
         elif opcion == "2":
-            menu_platos()
+            importlib.reload(main_votacion) #Recarga el modulo main_votacion
         elif opcion == "3":
             menu_categorias()
         elif opcion == "0":
