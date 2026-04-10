@@ -1,13 +1,15 @@
 #imports
 from votacion.sistema_votacion import SistemaVotacion
-from main_usuarios import obtener_usuario_actual 
 import main_usuarios
-import importlib #Importa el modulo importlib
 import main_votacion
 from usuarios.sistema_usuarios import SistemaUsuarios
+
 # ===== INSTANCIA =====
 sistema_usuarios = SistemaUsuarios()
 sistema_votacion = SistemaVotacion()
+main_usuarios.sistema_usuarios = sistema_usuarios
+main_votacion.sistema_votacion = sistema_votacion
+
 # ===== SUBMENÚ PLATOS (BASE) =====
 
 def menu_platos():
@@ -60,21 +62,24 @@ def menu():
 
         opcion = input("Seleccione una opción: ")
 
-     if opcion == "1":
-        
-        importlib.reload(main_usuarios) #Recarga el modulo main_usuarios
-
+        if opcion == "1":
+            main_usuarios.menu_usuarios()
         elif opcion == "2":
-            importlib.reload(main_votacion) #Recarga el modulo main_votacion
+            main_votacion.menu_votacion()
         elif opcion == "3":
+            resultados = sistema_votacion.ver_resultados()
+            print("\n--- RESULTADOS ---")
+            for genero, votos in resultados.items():
+                print(f"{genero}: {votos} votos")
+        elif opcion == "4":
+            menu_platos()
+        elif opcion == "5":
             menu_categorias()
         elif opcion == "0":
             print("Saliendo del sistema...")
             break
         else:
             print("Opción inválida")
-
-            
 
 
 # ===== EJECUCIÓN =====
