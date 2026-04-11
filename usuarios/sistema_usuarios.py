@@ -1,5 +1,5 @@
-from cliente import Cliente #Importacion del cliente
-from  administrador import Administrador #Importacion del administrador
+from .cliente import Cliente #Importacion del cliente
+from  .administrador import Administrador #Importacion del administrador
 
 class SistemaUsuarios:
     def __init__(self): #Constructor que incializa una lista de los usuarios
@@ -8,6 +8,10 @@ class SistemaUsuarios:
     def registro(self, nombre, correo, contraseña, rol): #Metodo para registrar un usuario
         if self.buscar_correo(correo): #Valida si ya existe otro usuario con el mismo correo
             return "Error, ya existe un usuario registrado con ese correo"
+        if "@" not in correo:
+            return "Error, correo inválido"
+        if not contraseña:
+            return "Error, contraseña obligatoria"
         
         rol = rol.strip().lower()
         

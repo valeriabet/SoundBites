@@ -1,18 +1,15 @@
 from votacion.sistema_votacion import SistemaVotacion
-from main_usuarios import obtener_usuario_actual
 
 sistema_votacion = SistemaVotacion()
 
-def menu_votacion():
+def menu_votacion(usuario):
     while True:
         print("\n--- MENÚ VOTACIÓN ---")
         print("1. Votar")
         print("2. Ver resultados")
-        print("0. Volver")
+        print("3. Volver")
 
         opcion = input("Seleccione una opción: ")
-
-        usuario = obtener_usuario_actual()
 
         if opcion == "1":
             if not usuario:
@@ -24,9 +21,7 @@ def menu_votacion():
                 continue
 
             print("\nGéneros disponibles:")
-            for g in sistema_votacion.listar_generos():
-                print(f"{g.id}. {g.nombre}")
-
+            print(sistema_votacion.listar_generos())
             try:
                 id_genero = int(input("Seleccione género: "))
                 print(sistema_votacion.votar(usuario, id_genero))
@@ -34,12 +29,10 @@ def menu_votacion():
                 print("Entrada inválida")
 
         elif opcion == "2":
-            resultados = sistema_votacion.ver_resultados()
             print("\n--- RESULTADOS ---")
-            for genero, votos in resultados.items():
-                print(f"{genero}: {votos} votos")
+            print(sistema_votacion.ver_resultados())
 
-        elif opcion == "0":
+        elif opcion == "3":
             break
 
         else:

@@ -1,52 +1,15 @@
-#imports
+import votacion.main_votacion as main_votacion
+import usuarios.main_usuarios as main_usuarios
 from votacion.sistema_votacion import SistemaVotacion
-import main_usuarios
-import main_votacion
 from usuarios.sistema_usuarios import SistemaUsuarios
 
 # ===== INSTANCIA =====
 sistema_usuarios = SistemaUsuarios()
 sistema_votacion = SistemaVotacion()
+
+# Compartir instancias
 main_usuarios.sistema_usuarios = sistema_usuarios
 main_votacion.sistema_votacion = sistema_votacion
-
-# ===== SUBMENÚ PLATOS (BASE) =====
-
-def menu_platos():
-    while True:
-        print("\n--- MENÚ PLATOS ---")
-        print("1. Crear plato")
-        print("2. Listar platos")
-        print("3. Buscar plato")
-        print("4. Eliminar plato")
-        print("0. Volver")
-
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == "0":
-            break
-        else:
-            print("Módulo en construcción")
-
-
-# ===== SUBMENÚ CATEGORÍAS (BASE) =====
-
-def menu_categorias():
-    while True:
-        print("\n--- MENÚ CATEGORÍAS ---")
-        print("1. Crear categoría")
-        print("2. Listar categorías")
-        print("3. Buscar categoría")
-        print("4. Eliminar categoría")
-        print("0. Volver")
-
-        opcion = input("Seleccione una opción: ")
-
-        if opcion == "0":
-            break
-        else:
-            print("Módulo en construcción")
-
 
 # ===== MENÚ PRINCIPAL =====
 
@@ -64,17 +27,15 @@ def menu():
 
         if opcion == "1":
             main_usuarios.menu_usuarios()
+            
         elif opcion == "2":
-            main_votacion.menu_votacion()
+            usuario = main_usuarios.usuario_actual
+            main_votacion.menu_votacion(usuario)
+            
         elif opcion == "3":
-            resultados = sistema_votacion.ver_resultados()
             print("\n--- RESULTADOS ---")
-            for genero, votos in resultados.items():
-                print(f"{genero}: {votos} votos")
-        elif opcion == "4":
-            menu_platos()
-        elif opcion == "5":
-            menu_categorias()
+            print(sistema_votacion.ver_resultados())
+            
         elif opcion == "0":
             print("Saliendo del sistema...")
             break

@@ -12,29 +12,28 @@ class SistemaVotacion:
         ]
 
     def votar(self, usuario, id_genero):
-    
         genero = next((g for g in self.generos if g.id == id_genero), None)
-
         if not genero:
             return "Género no válido"
+        if not usuario:
+            return "Debe iniciar sesión para votar"
 
         nuevo_voto = Voto(usuario, genero)
 
-        if not nuevo_voto.validar_voto(self.votos):
-            return "El usuario ya votó"
+        if not nuevo_voto.validar_voto_semanal(self.votos):
+            return "El usuario ya votó esta semana"
 
         nuevo_voto.procesar_voto()
 
         self.votos.append(nuevo_voto)
-        return "Voto registrado"
-
-    def ver_resultados(self):
-        resultados = {}
-
-        for g in self.generos:
-            resultados[g.nombre] = g.obtener_votos()
-
-        return resultados
+        return f"Voto registrado para {genero.nombre}"
 
     def listar_generos(self):
-        return self.generos
+        return "\n".join([g.mostrar() for g in self.generos])
+    
+    def ver_resultados(self):
+        generos_ordenados = sorted(self.generos, key=lambda g: g.votos, reverse=True)
+
+        return "\n".join(
+            [f"{g.nombre}: {g.votos} votos" for g in generos_ordenados]
+        )

@@ -11,11 +11,11 @@ class Voto:
         self.fecha_hora = datetime.now()
         self.periodo = "semanal"
         
-    def validar_voto(self, votos):
+    def validar_voto_semanal(self, votos):
         for v in votos:
-            if v.usuario.id == self.usuario.id:
+            if v.usuario.id == self.usuario.id and v.periodo == self.periodo:
                 return False
         return True
     
     def procesar_voto(self):
-        self.genero.votos += 1
+        self.genero.agregar_voto()

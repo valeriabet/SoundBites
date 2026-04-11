@@ -7,6 +7,14 @@ class Genero:
         self.nombre = nombre
         self.descripcion = descripcion
         self.votos = 0
+        if not nombre:
+            raise ValueError("El nombre del género es obligatorio")
+        
+    def mostrar(self):
+        return f"{self.id}. {self.nombre} - {self.votos} votos"
+        
+    def agregar_voto(self):
+        self.votos += 1
         
     def obtener_votos(self):
         return self.votos

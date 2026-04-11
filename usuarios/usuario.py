@@ -11,7 +11,7 @@ class Usuario:
         
     @property #Encapsulamiento de la contraseña para que no se pueda leer
     def contraseña(self):
-        raise AttributeError("La contraseña no se puede leer directamente") #Error si se intenta acceder a la contraseña de forma directa
+        return ("********") #Retorna una cadena oculta en lugar de la contraseña real
     
     @contraseña.setter #Stter para cambiar la contraseña
     def contraseña(self, nueva_contraseña):
