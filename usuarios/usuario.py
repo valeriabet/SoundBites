@@ -8,6 +8,7 @@ class Usuario:
         self.correo = correo
         self.__contraseña = contraseña #Define la contraseña como atributo privado
         self.rol = rol
+        self.favoritos = [] #Lista para almacenar los favoritos del usuario
         
     @property #Encapsulamiento de la contraseña para que no se pueda leer
     def contraseña(self):
@@ -28,3 +29,23 @@ class Usuario:
          
     def actualizar_correo(self, nuevo_correo): #Metodo para actualizar correo
         self.correo = nuevo_correo
+        
+    def agregar_favorito(self, plato): #Metodo para agregar un plato favorito a la cuenta del usuario
+        if plato not in self.favoritos:
+            self.favoritos.append(plato)
+            return True
+        return False
+
+
+    def eliminar_favorito(self, id_plato): #Metodo para eliminar un plato favorito de la cuenta del usuario por ID del plato
+        for p in self.favoritos:
+            if p.id == id_plato:
+                self.favoritos.remove(p)
+                return True
+        return False
+
+
+    def listar_favoritos(self):
+        if not self.favoritos:
+            return "No tienes favoritos"
+        return "\n".join([str(p) for p in self.favoritos])
