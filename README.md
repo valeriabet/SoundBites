@@ -28,6 +28,7 @@ Desarrollar una aplicación en Python que implemente los principios de la progra
 
 * Crear plato
 * Listar Platos
+* Poner platos en favoritos
 
 ###  Gestión de categorías
 
