@@ -64,3 +64,9 @@ Proyecto en desarrollo correspondiente a la Fase 1 (Modelado con Programación O
 
 * Python 3
 * Programación Orientada a Objetos (POO)
+
+---
+
+## Documento de Diseño
+
+* https://canon-flute-79056857.figma.site/
