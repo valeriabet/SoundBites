@@ -1,5 +1,5 @@
-from plato import Plato
-from categoria import Categoria
+from .plato import Plato
+from .categoria import Categoria
 
 class SistemaMenu:
     def __init__(self):
