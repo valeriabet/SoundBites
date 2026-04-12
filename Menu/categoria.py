@@ -1,5 +1,10 @@
-from plato import EntidadBase
-
-class Categoria(EntidadBase):
-    def __init__(self, id_cat, nombre):
-        super().__init__(id_cat, nombre)
+class Categoria():
+    contador_id = 1
+    
+    def __init__(self, nombre):
+        self.id = Categoria.contador_id
+        Categoria.contador_id += 1
+        self.nombre = nombre
+        
+    def __str__(self):
+        return f"{self.id}. {self.nombre}"

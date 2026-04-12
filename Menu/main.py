@@ -1,46 +1,120 @@
-from plato import Plato
-from categoria import Categoria
-from sistema_menu import Usuario, MenuService
+from sistema_menu import SistemaMenu
 
-def ejecutar_app():
-    service = MenuService()
-    usuario_actual = Usuario(1, "Cliente")
+sistema_menu = SistemaMenu()
 
-    # Carga inicial de datos
-    service.agregar_categoria(Categoria(1, "Entradas"))
-    service.agregar_categoria(Categoria(2, "Platos Fuertes"))
-    service.agregar_categoria(Categoria(3, "Postres"))
-
-    service.crear_plato(Plato(101, "Empanadas", "3 de carne", 4500, 1))
-    service.crear_plato(Plato(201, "Lasaña", "Pasta artesanal", 20000, 2))
-    service.crear_plato(Plato(301, "Brownie", "Con helado", 15000, 3))
-
+def menu_menu():
     while True:
-        print(f"\nHola, {usuario_actual.nombre}")
-        print("1. Ver Menú | 2. Ver Favoritos | 3. Añadir Favorito | 4. Quitar Favorito | 5. Salir")
-        
-        opcion = input("\nSeleccione: ")
+        print("\n Menú restaurante")
+        print("1. Gestión de platos")
+        print("2. Gestión de categorías")
+        print("0. Volver")
+
+        opcion = input("Seleccione una opción: ")
 
         if opcion == "1":
-            service.listar_todo_el_menu()
+            menu_platos()
         elif opcion == "2":
-            favs = usuario_actual.obtener_favoritos()
-            print("\n MIS FAVORITOS:", [f.nombre for f in favs] if favs else "Vacío")
+            menu_categorias()
+        elif opcion == "0":
+            break
+        else:
+            print("Opción inválida")
+
+
+#Submenú platos
+def menu_platos():
+    while True:
+        print("\n Menú platos")
+        print("1. Crear plato")
+        print("2. Listar platos")
+        print("3. Buscar plato")
+        print("4. Eliminar plato")
+        print("0. Volver")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            try:
+                nombre = input("Nombre: ")
+                descripcion = input("Descripción: ")
+                precio = float(input("Precio: "))
+                print("\nCategorías disponibles:")
+                if not (sistema_menu.listar_categorias()):
+                    print("No hay categorías. Cree una primero.")
+                    continue
+                else:
+                    print(sistema_menu.listar_categorias())
+                    id_categoria = int(input("Seleccione ID de categoría: "))   
+
+                if sistema_menu.crear_plato(nombre, descripcion, precio, id_categoria):
+                    print("Plato creado correctamente")
+            except ValueError:
+                print("Datos inválidos")
+
+        elif opcion == "2":
+            print("\n Lista de platos")
+            platos = sistema_menu.listar_platos()
+            print(platos if platos else "No hay platos registrados")
+
         elif opcion == "3":
             try:
-                id_p = int(input("ID del plato: "))
-                plato = service.buscar_plato_por_id(id_p)
-                if plato and usuario_actual.agregar_a_favoritos(plato):
-                    print("Guardado.")
-            except: print("Error de ID.")
+                id_plato = int(input("ID del plato: "))
+                plato = sistema_menu.buscar_plato(id_plato)
+                if plato:
+                    print(plato)
+                else:
+                    print("No encontrado")
+            except ValueError:
+                print("ID inválido")
+
         elif opcion == "4":
             try:
-                id_p = int(input("ID a quitar: "))
-                if usuario_actual.eliminar_de_favoritos(id_p):
-                    print("Eliminado.")
-            except: print("Error.")
-        elif opcion == "5":
-            break
+                id_plato = int(input("ID del plato a eliminar: "))
+                print(sistema_menu.eliminar_plato(id_plato))
+            except ValueError:
+                print("ID inválido")
 
+        elif opcion == "0":
+            break
+        else:
+            print("Opción inválida")
+
+
+#Submenú categorias
+def menu_categorias():
+    while True:
+        print("\n MEnú categorias")
+        print("1. Crear categoría")
+        print("2. Listar categorías")
+        print("0. Volver")
+
+        opcion = input("Seleccione una opción: ")
+
+        if opcion == "1":
+            try:
+                nombre = input("Nombre: ")
+
+                if sistema_menu.agregar_categoria(nombre):
+                    print("Categoría creada")
+                else:
+                    print("Ya existe esa categoría")
+            except ValueError:
+                print("Datos inválidos")
+
+        elif opcion == "2":
+            print("\n Lista de categorias")
+            if sistema_menu.categorias:
+                for c in sistema_menu.categorias:
+                    print(c)
+            else:
+                print("No hay categorías")
+
+        elif opcion == "0":
+            break
+        else:
+            print("Opción inválida")
+
+
+# ===== EJECUCIÓN (solo para pruebas) =====
 if __name__ == "__main__":
-    ejecutar_app()
+    menu_menu()
