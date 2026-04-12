@@ -26,11 +26,13 @@ Desarrollar una aplicación en Python que implemente los principios de la progra
 
 ### Gestión de platos
 
-* (En desarrollo)
+* Crear plato
+* Listar Platos
 
 ###  Gestión de categorías
 
-* (En desarrollo)
+* Crear categorias
+* Ver categorias
 
 ---
 
