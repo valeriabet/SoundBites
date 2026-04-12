@@ -29,7 +29,7 @@ def menu_votacion(usuario):
                 print("Entrada inválida")
 
         elif opcion == "2":
-            print("\n--- RESULTADOS ---")
+            print("\n Resultados de votación:")
             print(sistema_votacion.ver_resultados())
 
         elif opcion == "3":

@@ -80,3 +80,6 @@ def menu_usuarios():
 
         else:
             print("Opción no válida, por favor intente nuevamente.")
+            
+def obtener_usuario_actual():
+    return usuario_actual
