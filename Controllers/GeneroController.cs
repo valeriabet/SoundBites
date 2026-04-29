@@ -34,20 +34,46 @@ namespace SoundBitesAPI.Controllers
         [HttpPut("actualizar genero/{id}")]
         public async Task<ActionResult> ActualizarGenero(int id, Genero genero)
         {
-            var GeneroActualizado = await _context.Generos.FindAsync(id);
+            var generoActualizado = await _context.Generos.FindAsync(id);
 
-            if (GeneroActualizado == null)
+            if (generoActualizado == null)
             {
                 return NotFound(); //404
             }
-            GeneroActualizado.Nombre = genero.Nombre;
-            GeneroActualizado.Descripcion = genero.Descripcion;
-            GeneroActualizado.Votos = genero.Votos;
+            generoActualizado.Nombre = genero.Nombre;
+            generoActualizado.Descripcion = genero.Descripcion;
+    
 
             await _context.SaveChangesAsync();
 
-            return Ok(GeneroActualizado);
+            return Ok(generoActualizado);
 
+        }
+
+        [HttpDelete("eliminar/{id}")]
+        public async Task<ActionResult> EliminarGenero(int id)
+        {
+            var genero = await _context.Generos.FindAsync(id);
+
+            if (genero == null)
+            {
+                return NotFound();
+            }
+
+            _context.Generos.Remove(genero);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("buscar/{id}")]
+        public async Task<ActionResult<Genero>> BuscarPorId(int id)
+        {
+            var genero = await _context.Generos.FindAsync(id);
+            if (genero == null)
+            {
+                return NotFound();
+            }
+            return Ok(genero);
         }
     }
 }

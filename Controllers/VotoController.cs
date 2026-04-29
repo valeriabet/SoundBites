@@ -23,12 +23,37 @@ namespace SoundBitesAPI.Controllers
             return Ok(votos); //200
         }
 
-        [HttpPost("Guardar voto")]
-        public async Task<ActionResult<Genero>> GuardarVoto(Voto voto)
+        [HttpPost("guardar voto")]
+        public async Task<ActionResult<Voto>> GuardarVoto(Voto voto)
         {
             _context.Votos.Add(voto);
             await _context.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created, voto);
+        }
+        [HttpDelete("eliminar/{id}")]
+        public async Task<ActionResult> EliminarVoto(int id)
+        {
+            var voto = await _context.Votos.FindAsync(id);
+
+            if (voto == null)
+            {
+                return NotFound();
+            }
+
+            _context.Votos.Remove(voto);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("buscar/{id}")]
+        public async Task<ActionResult<Voto>> BuscarPorId(int id)
+        {
+            var voto = await _context.Votos.FindAsync(id);
+            if (voto == null)
+            {
+                return NotFound();
+            }
+            return Ok(voto);
         }
     }
 }

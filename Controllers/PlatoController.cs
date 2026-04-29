@@ -24,11 +24,56 @@ namespace SoundBitesAPI.Controllers
         }
 
         [HttpPost("guardar plato")]
-        public async Task<ActionResult<Genero>> GuardarPlato(Plato plato)
+        public async Task<ActionResult<Plato>> GuardarPlato(Plato plato)
         {
             _context.Platos.Add(plato);
             await _context.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created, plato);
+        }
+        [HttpPut("actualizar plato/{id}")]
+        public async Task<ActionResult> ActualizarPlato(int id, Plato plato)
+        {
+            var platoActualizado = await _context.Platos.FindAsync(id);
+
+            if (platoActualizado == null)
+            {
+                return NotFound(); //404
+            }
+            platoActualizado.Nombre = plato.Nombre;
+            platoActualizado.Descripcion = plato.Descripcion;
+            platoActualizado.Precio = plato.Precio;
+            platoActualizado.IdCategoria = plato.IdCategoria;
+
+            await _context.SaveChangesAsync();
+
+            return Ok(platoActualizado);
+
+        }
+
+        [HttpDelete("eliminar/{id}")]
+        public async Task<ActionResult> EliminarPlato(int id)
+        {
+            var plato = await _context.Platos.FindAsync(id);
+
+            if (plato == null)
+            {
+                return NotFound();
+            }
+
+            _context.Platos.Remove(plato);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+
+        [HttpGet("buscar/{id}")]
+        public async Task<ActionResult<Plato>> BuscarPorId(int id)
+        {
+            var plato = await _context.Platos.FindAsync(id);
+            if (plato == null)
+            {
+                return NotFound();
+            }
+            return Ok(plato);
         }
     }
 }

@@ -30,5 +30,29 @@ namespace SoundBitesAPI.Controllers
             await _context.SaveChangesAsync();
             return StatusCode(StatusCodes.Status201Created, favorito);
         }
+        [HttpDelete("eliminar/{id}")]
+        public async Task<ActionResult> EliminarFavorito(int id)
+        {
+            var favorito = await _context.Favoritos.FindAsync(id);
+
+            if (favorito == null)
+            {
+                return NotFound();
+            }
+
+            _context.Favoritos.Remove(favorito);
+            await _context.SaveChangesAsync();
+            return NoContent();
+        }
+        [HttpGet("buscar/{id}")]
+        public async Task<ActionResult<Favorito>> BuscarPorId(int id)
+        {
+            var favorito = await _context.Favoritos.FindAsync(id);
+            if (favorito == null)
+            {
+                return NotFound();
+            }
+            return Ok(favorito);
+        }
     }
 }
