@@ -2,7 +2,7 @@ using Microsoft.EntityFrameworkCore;
 using SoundBitesAPI.Models;
 
 var builder = WebApplication.CreateBuilder(args);
-builder.Services.AddDbContext<DbSoundBitesContext>(options =>
+builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("connectionDB"))
      );
 // Add services to the container.
