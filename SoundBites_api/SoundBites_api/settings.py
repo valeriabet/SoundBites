@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'usuarios',
     'generos',
     'favoritos',
-    'votacion',
+    'reservas',
     'rest_framework',
 ]
 
@@ -82,7 +82,8 @@ DATABASES = {
     'default': {
         'ENGINE': 'mssql',
         'NAME': 'db_sound_bites',
-        'HOST': r'ANYBETANCOURT\SQLEXPRESS',
+        # TODO: Cambiar a la IP del servidor
+        'HOST': r'laptop-f41fhj4b\SQLEXPRESS',
         'PORT': '',
         'OPTIONS': {
             'driver': 'ODBC Driver 17 for SQL Server',
