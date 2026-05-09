@@ -41,6 +41,8 @@ INSTALLED_APPS = [
     'generos',
     'favoritos',
     'votacion',
+    'plato',
+    'categoria',
     'rest_framework',
 ]
 
