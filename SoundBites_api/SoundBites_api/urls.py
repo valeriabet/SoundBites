@@ -16,9 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from rest_framework.routers import DefaultRouter
+
+from generos.views import GeneroViewSet
+from favoritos.views import FavoritoViewSet
+from usuarios.views import UsuarioViewSet
+from reservas.views import ReservaViewSet
+# Se crea el router para los endpoints
+router = DefaultRouter()
+router.register('generos',   GeneroViewSet)
+router.register('favoritos', FavoritoViewSet)
+router.register('usuarios',  UsuarioViewSet)
+router.register('reservas',  ReservaViewSet)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+<<<<<<< HEAD
     path('api/', include('generos.urls')),
     path('api/', include('favoritos.urls')),
     path('api/', include('usuarios.urls')),
@@ -26,3 +39,7 @@ urlpatterns = [
     path('api/', include('categoria.urls')),
     path('api/', include('plato.urls')),
 ]
+=======
+    path('api/', include(router.urls)),
+]
+>>>>>>> 078dd2a3b88ff45057d22228526c3d23831f4fe6
