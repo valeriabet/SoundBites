@@ -23,4 +23,7 @@ urlpatterns = [
     path('api/', include('favoritos.urls')),
     path('api/', include('usuarios.urls')),
     path('api/', include('votacion.urls')),
+    path('api/', include('categoria.urls')),
+    path('api/', include('plato.urls')),
+    path('api/', include('reservas.urls')),
 ]
