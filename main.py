@@ -1,10 +1,10 @@
-from usuarios.usuario import Usuario
-import votacion.main_votacion as main_votacion
-import usuarios.main_usuarios as main_usuarios
-import Menu.main_menu as main_menu
-from votacion.sistema_votacion import SistemaVotacion
-from usuarios.sistema_usuarios import SistemaUsuarios
-from usuarios.main_usuarios import obtener_usuario_actual
+from proyecto_consola.usuarios.usuario import Usuario
+import proyecto_consola.votacion.main_votacion as main_votacion
+import proyecto_consola.usuarios.main_usuarios as main_usuarios
+import proyecto_consola.Menu.main_menu as main_menu
+from proyecto_consola.votacion.sistema_votacion import SistemaVotacion
+from proyecto_consola.usuarios.sistema_usuarios import SistemaUsuarios
+from proyecto_consola.usuarios.main_usuarios import obtener_usuario_actual
 
 # ===== INSTANCIAS =====
 sistema_usuarios = SistemaUsuarios()

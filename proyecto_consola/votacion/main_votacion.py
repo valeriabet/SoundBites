@@ -1,4 +1,4 @@
-from votacion.sistema_votacion import SistemaVotacion
+from proyecto_consola.votacion.sistema_votacion import SistemaVotacion
 
 sistema_votacion = SistemaVotacion()
 
