@@ -1,33 +1,40 @@
 import { useState } from "react";
 import { MdMusicNote } from "react-icons/md";
+import { useNavigate } from "react-router-dom";
+import { MdVisibility, MdVisibilityOff } from "react-icons/md";
+
+
 
 function Register() {
   const [nombre, setNombre] = useState("");
   const [correo, setCorreo] = useState("");
   const [contraseña, setContraseña] = useState("");
+  const [verContraseña, setVerContraseña] = useState(false);
   const [rol, setRol] = useState("Cliente");
+  const navigate = useNavigate();
 
   const handleRegister = async () => {
     const nuevoUsuario = { nombre, correo, contraseña, rol };
+//conexion con base de datos (por hacer)
+    // const response = await fetch(
+    //   "https://localhost:7117/api/usuario/guardar usuario",
+    //   {
+    //     method: "POST",
+    //     headers: { "Content-Type": "application/json" },
+    //     body: JSON.stringify(nuevoUsuario),
+    //   },
+    // );
 
-    const response = await fetch(
-      "https://localhost:7117/api/usuario/guardar usuario",
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(nuevoUsuario),
-      },
-    );
-
-    if (response.ok) {
-      alert("Usuario registrado correctamente");
-    } else {
-      alert("Error al registrar");
-    }
+  //   if (response.ok) {
+  //     alert("Usuario registrado correctamente");
+  //   } else {
+  //     alert("Error al registrar");
+  //   }
+  // };
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+    <div className="min-h-screen bg-orange-200 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
@@ -68,16 +75,28 @@ function Register() {
 
         {/* Contraseña */}
         <div className="mb-4">
-          <label className="text-sm font-medium text-gray-700 block mb-1">
+        <label className="text-sm font-medium text-gray-700 block mb-1">
             Contraseña
           </label>
-          <input
-            type="password"
-            placeholder="········"
-            className="w-full border rounded-xl px-3 py-2 bg-gray-50 outline-none text-sm"
-            value={contraseña}
-            onChange={(e) => setContraseña(e.target.value)}
-          />
+          <div className="flex items-center border rounded-xl px-3 py-2 bg-gray-50">
+            <input
+              type={verContraseña ? "text" : "password"}
+              placeholder="········"
+              className="bg-transparent outline-none w-full text-sm"
+              value={contraseña}
+              onChange={(e) => setContraseña(e.target.value)}
+            />
+            <button
+              onClick={() => setVerContraseña(!verContraseña)}
+              className="text-gray-400"
+            >
+              {verContraseña ? (
+                <MdVisibilityOff size={18} />
+              ) : (
+                <MdVisibility size={18} />
+              )}
+            </button>
+          </div>
         </div>
 
         {/* Rol */}
@@ -107,15 +126,16 @@ function Register() {
         <p className="text-center text-sm text-gray-500 mt-4">
           ¿Ya tienes una cuenta?{" "}
           <span
-            onClick={() => navigate("/")}
+            onClick={() => navigate("/login")}
             className="text-orange-400 font-semibold cursor-pointer"
           >
             Inicia Sesión
           </span>
         </p>
+
       </div>
     </div>
   );
 }
 
-export default Register;
+export default Register; 

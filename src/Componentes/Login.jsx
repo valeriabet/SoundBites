@@ -1,20 +1,19 @@
 import { useState } from "react";
 import { MdMusicNote } from "react-icons/md";
 import { MdVisibility, MdVisibilityOff } from "react-icons/md";
-import { useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 
-function App() {
+function Login() {
   const [correo, setCorreo] = useState("");
   const [contraseña, setContraseña] = useState("");
   const [verContraseña, setVerContraseña] = useState(false);
-  const navigate = useNavigate();
 
   const handleLogin = async () => {
     //conexion con la API
   };
 
   return (
-    <div className="min-h-screen bg-orange-50 flex items-center justify-center">
+    <div className="min-h-screen bg-orange-200 flex items-center justify-center">
       <div className="bg-white rounded-2xl shadow-md p-8 w-full max-w-sm">
         {/* Logo */}
         <div className="flex flex-col items-center mb-6">
@@ -104,16 +103,22 @@ function App() {
         {/* Registro */}
         <p className="text-center text-sm text-gray-500">
           ¿No tienes una cuenta?{" "}
-          <span
-            onClick={() => navigate("/register")}
+          <Link
+            to="/register"
             className="text-orange-400 font-semibold cursor-pointer"
           >
             Regístrate
-          </span>
+          </Link>
+        </p>
+
+        {/*Continuar como invitado*/}
+        <p className="text-center text-xs text-orange-500 p-2">
+          <Link to="/">          Continua como invitado
+          </Link>
         </p>
 
         {/* Terminos */}
-        <p className="text-center text-xs text-gray-400 mt-4">
+        <p className="text-center text-xs text-gray-400 mt-3">
           Al iniciar sesión, aceptas nuestros términos y condiciones
         </p>
       </div>
@@ -121,4 +126,4 @@ function App() {
   );
 }
 
-export default App;
+export default Login;
