@@ -9,5 +9,4 @@ public partial class Categoria
 
     public string Nombre { get; set; } = null!;
 
-    public virtual ICollection<Plato> Platos { get; set; } = new List<Plato>();
 }

@@ -13,5 +13,5 @@ public partial class Genero
 
     public int? Votos { get; set; }
 
-    public virtual ICollection<Voto> VotosNavigation { get; set; } = new List<Voto>();
+
 }

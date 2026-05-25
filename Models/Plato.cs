@@ -14,8 +14,4 @@ public partial class Plato
     public decimal Precio { get; set; }
 
     public int IdCategoria { get; set; }
-
-    public virtual ICollection<Favorito> Favoritos { get; set; } = new List<Favorito>();
-
-    public virtual Categoria IdCategoriaNavigation { get; set; } = null!;
 }

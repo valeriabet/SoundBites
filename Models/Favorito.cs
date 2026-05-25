@@ -11,7 +11,5 @@ public partial class Favorito
 
     public int IdPlato { get; set; }
 
-    public virtual Plato IdPlatoNavigation { get; set; } = null!;
 
-    public virtual Usuario IdUsuarioNavigation { get; set; } = null!;
 }

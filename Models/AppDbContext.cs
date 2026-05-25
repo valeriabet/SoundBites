@@ -16,29 +16,17 @@ public partial class AppDbContext : DbContext
     }
 
     public virtual DbSet<Categoria> Categorias { get; set; }
-
     public virtual DbSet<Favorito> Favoritos { get; set; }
-
     public virtual DbSet<Genero> Generos { get; set; }
-
     public virtual DbSet<Plato> Platos { get; set; }
-
     public virtual DbSet<Usuario> Usuarios { get; set; }
-
-    public virtual DbSet<Voto> Votos { get; set; }
-
-    /*
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-#warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-        => optionsBuilder.UseSqlServer("Server=ANYBETANCOURT\\SQLEXPRESS;Database=db_sound_bites;Trusted_Connection=True;TrustServerCertificate=True;");
-    */
+    public virtual DbSet<Reserva> Reservas { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Categoria>(entity =>
         {
             entity.HasKey(e => e.IdCategoria).HasName("PK__Categori__CD54BC5A19BD4F0E");
-
             entity.Property(e => e.IdCategoria).HasColumnName("id_categoria");
             entity.Property(e => e.Nombre)
                 .HasMaxLength(100)
@@ -48,28 +36,15 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<Favorito>(entity =>
         {
             entity.HasKey(e => e.IdFavorito).HasName("PK__Favorito__78F875AECE2C7E54");
-
             entity.HasIndex(e => new { e.IdUsuario, e.IdPlato }, "uq_favorito").IsUnique();
-
             entity.Property(e => e.IdFavorito).HasColumnName("id_favorito");
             entity.Property(e => e.IdPlato).HasColumnName("id_plato");
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
-
-            entity.HasOne(d => d.IdPlatoNavigation).WithMany(p => p.Favoritos)
-                .HasForeignKey(d => d.IdPlato)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_fav_plato");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithMany(p => p.Favoritos)
-                .HasForeignKey(d => d.IdUsuario)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_fav_usuario");
         });
 
         modelBuilder.Entity<Genero>(entity =>
         {
             entity.HasKey(e => e.IdGenero).HasName("PK__Generos__99A8E4F9B6982DCF");
-
             entity.Property(e => e.IdGenero).HasColumnName("id_genero");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(200)
@@ -85,7 +60,6 @@ public partial class AppDbContext : DbContext
         modelBuilder.Entity<Plato>(entity =>
         {
             entity.HasKey(e => e.IdPlato).HasName("PK__Platos__04D4F2C09CDBE993");
-
             entity.Property(e => e.IdPlato).HasColumnName("id_plato");
             entity.Property(e => e.Descripcion)
                 .HasMaxLength(200)
@@ -97,19 +71,12 @@ public partial class AppDbContext : DbContext
             entity.Property(e => e.Precio)
                 .HasColumnType("decimal(10, 2)")
                 .HasColumnName("precio");
-
-            entity.HasOne(d => d.IdCategoriaNavigation).WithMany(p => p.Platos)
-                .HasForeignKey(d => d.IdCategoria)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_platos_categoria");
         });
 
         modelBuilder.Entity<Usuario>(entity =>
         {
             entity.HasKey(e => e.IdUsuario).HasName("pk_id_usuario");
-
             entity.ToTable("Usuario");
-
             entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.Contraseña)
                 .HasMaxLength(50)
@@ -129,29 +96,18 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("rol");
         });
 
-        modelBuilder.Entity<Voto>(entity =>
+        modelBuilder.Entity<Reserva>(entity =>
         {
-            entity.HasKey(e => e.IdVoto).HasName("PK__Votos__5F39601A45809D18");
-
-            entity.HasIndex(e => e.IdUsuario, "uq_usuario_voto").IsUnique();
-
-            entity.Property(e => e.IdVoto).HasColumnName("id_voto");
+            entity.HasKey(e => e.IdReserva).HasName("PK_Reservas");
+            entity.ToTable("Reservas");
+            entity.Property(e => e.IdReserva).HasColumnName("id_reserva");
+            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
             entity.Property(e => e.Fecha)
                 .HasDefaultValueSql("(getdate())")
                 .HasColumnType("datetime")
                 .HasColumnName("fecha");
+            entity.Property(e => e.NumeroPersonas).HasColumnName("numero_personas");
             entity.Property(e => e.IdGenero).HasColumnName("id_genero");
-            entity.Property(e => e.IdUsuario).HasColumnName("id_usuario");
-
-            entity.HasOne(d => d.IdGeneroNavigation).WithMany(p => p.VotosNavigation)
-                .HasForeignKey(d => d.IdGenero)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_votos_genero");
-
-            entity.HasOne(d => d.IdUsuarioNavigation).WithOne(p => p.Voto)
-                .HasForeignKey<Voto>(d => d.IdUsuario)
-                .OnDelete(DeleteBehavior.ClientSetNull)
-                .HasConstraintName("fk_votos_usuario");
         });
 
         OnModelCreatingPartial(modelBuilder);
