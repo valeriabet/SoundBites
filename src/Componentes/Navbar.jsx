@@ -1,53 +1,89 @@
+import { useState, useEffect } from "react";
 import { Link, NavLink } from "react-router-dom";
 import { MdMusicNote } from "react-icons/md";
 
-const linkClass =
-  "block py-2 px-3 text-heading rounded hover:bg-neutral-tertiary md:hover:bg-transparent md:border-0 md:hover:text-fg-brand md:p-0";
-
 const Navbar = () => {
+  const [scrolled, setScrolled] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  const linkClass =
+    "text-sm font-semibold transition-colors duration-200 hover:text-orange-400";
+
   return (
-    <nav className="bg-orange-200 fixed w-full z-20 top-0 start-0 border-b border-default">
-      <div className="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4 ">
-        <Link
-          to="/"
-          className="flex items-center space-x-3 rtl:space-x-reverse"
-        >
-          <div className="bg-orange-400 rounded-full p-2">
-            <MdMusicNote color="white" size={30} />
+    <nav
+      className={[
+        "fixed w-full z-20 top-0 start-0 transition-all duration-300",
+        scrolled
+          ? "bg-gray-900/95 backdrop-blur-sm shadow-lg"
+          : "bg-transparent",
+      ].join(" ")}
+      style={{ fontFamily: "'Nunito', sans-serif" }}
+    >
+      <div className="max-w-5xl flex items-center justify-between mx-auto px-8 py-4">
+        {/* Logo */}
+        <Link to="/" className="flex items-center gap-3">
+          <div className="bg-orange-400 rounded-full p-2 shrink-0">
+            <MdMusicNote color="white" size={24} />
           </div>
-          <span className="self-center text-xl font-semibold whitespace-nowrap text-black hover:text-white">
+          <span
+            className={[
+              "text-lg font-black transition-colors duration-300",
+              scrolled ? "text-white" : "text-gray-800",
+            ].join(" ")}
+          >
             SoundBites
           </span>
         </Link>
 
-        <div className="hidden w-full md:block md:w-auto" id="navbar-default">
-          <ul className="font-medium flex flex-col p-4 md:p-0 mt-4 border border-default rounded-base bg-neutral-secondary-soft md:flex-row md:space-x-8 rtl:space-x-reverse md:mt-0 md:border-0 md:bg-neutral-primary md:items-center ">
-            <li className="hover:text-white">
-              <NavLink
-                to="/"
-                end
-                className={({ isActive }) =>
-                  `${linkClass}${isActive ? " md:text-fg-brand" : ""}`
-                }
-              >
-                Home
-              </NavLink>
-            </li>
-            <li className="hover:text-white" >
-              <a href="#reserva">Reserva</a>
-            </li>
-            <li className="hover:text-white">
-              <NavLink
-                to="/login"
-                className={({ isActive }) =>
-                  `${linkClass} md:border md:border-default md:rounded-lg md:px-4${isActive ? " md:bg-neutral-tertiary" : ""}`
-                }
-              >
-                Login
-              </NavLink>
-            </li>
-          </ul>
-        </div>
+        {/* Links */}
+        <ul className="flex items-center gap-8">
+          <li>
+            <NavLink
+              to="/"
+              end
+              className={({ isActive }) =>
+                `${linkClass} ${
+                  isActive
+                    ? "text-orange-400"
+                    : scrolled
+                      ? "text-white/80"
+                      : "text-gray-800"
+                }`
+              }
+            >
+              Home
+            </NavLink>
+          </li>
+          <li>
+            <a
+              href="#Carrusel"
+              className={`${linkClass} ${scrolled ? "text-white/80" : "text-gray-800"}`}
+            >
+              Reserva
+            </a>
+          </li>
+          <li>
+            <NavLink
+              to="/login"
+              className={({ isActive }) =>
+                `${linkClass} px-4 py-1.5 rounded-lg border transition-all duration-200 ${
+                  isActive
+                    ? "bg-orange-400 border-orange-400 text-white"
+                    : scrolled
+                      ? "border-white/30 text-white/80 hover:border-orange-400"
+                      : "border-gray-400 text-gray-800 hover:border-orange-400"
+                }`
+              }
+            >
+              Login
+            </NavLink>
+          </li>
+        </ul>
       </div>
     </nav>
   );

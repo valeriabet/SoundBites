@@ -1,5 +1,7 @@
 import video from "../assets/background-video.mp4";
 import CarruselReserva from "./CarruselReserva";
+import SeccionPlatos from "./SeccionPlatos";
+import Footer from "./Footer";
 const Home = () => {
   return (
     <>
@@ -20,9 +22,9 @@ const Home = () => {
           </p>
         </div>
       </div>
-      <div id="reserva"></div>
-
+      <SeccionPlatos></SeccionPlatos>
       <CarruselReserva></CarruselReserva>
+      <Footer></Footer>
     </>
   );
 };
