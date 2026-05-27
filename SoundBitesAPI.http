@@ -1,0 +1,6 @@
+@SoundBitesAPI_HostAddress = http://localhost:5025
+
+GET {{SoundBitesAPI_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
