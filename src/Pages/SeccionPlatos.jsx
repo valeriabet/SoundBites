@@ -1,5 +1,11 @@
 import { useState, useEffect, useRef } from "react";
 
+import {
+    guardarFavorito,
+    eliminarFavoritoUsuarioPlato,
+    obtenerFavoritosUsuario,
+} from "../Services/favoritoService";
+
 const FontLoader = () => (
     <style>{`
     @import url('https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap');
@@ -29,8 +35,18 @@ const fmt = (n) =>
 // Tarjeta Plato
 // ─────────────────────────────
 
-const TarjetaPlato = ({ plato, visible }) => {
+const TarjetaPlato = ({
+    plato,
+    visible,
+    favoritos,
+    toggleFavorito,
+}) => {
+
     const [hover, setHover] = useState(false);
+
+    const esFavorito = favoritos.some(
+        (f) => f.idPlato === plato.idPlato
+    );
 
     return (
         <article
@@ -38,15 +54,18 @@ const TarjetaPlato = ({ plato, visible }) => {
             onMouseLeave={() => setHover(false)}
             className={[
                 "bg-white rounded-2xl overflow-hidden flex flex-col cursor-default transition-all duration-500",
+
                 visible
                     ? "opacity-100 translate-y-0"
                     : "opacity-0 translate-y-6",
+
                 hover
                     ? "shadow-[0_12px_36px_rgba(0,0,0,0.13)] -translate-y-1"
                     : "shadow-[0_2px_12px_rgba(0,0,0,0.07)]",
             ].join(" ")}
         >
             {/* Imagen */}
+
             <div
                 className="relative overflow-hidden"
                 style={{ aspectRatio: "4/3" }}
@@ -59,11 +78,26 @@ const TarjetaPlato = ({ plato, visible }) => {
                     alt={plato.nombre}
                     className={[
                         "w-full h-full object-cover block transition-transform duration-500",
-                        hover ? "scale-[1.06]" : "scale-100",
+
+                        hover
+                            ? "scale-[1.06]"
+                            : "scale-100",
                     ].join(" ")}
                 />
 
+                {/* FAVORITO */}
+
+                <button
+                    onClick={() =>
+                        toggleFavorito(plato.idPlato)
+                    }
+                    className="absolute top-3 right-3 text-2xl z-10"
+                >
+                    {esFavorito ? "❤️" : "🤍"}
+                </button>
+
                 {/* Precio */}
+
                 <div
                     className="absolute bottom-3 left-3 px-3 py-1 rounded-full text-white text-xs font-bold tracking-wide"
                     style={{
@@ -76,6 +110,7 @@ const TarjetaPlato = ({ plato, visible }) => {
             </div>
 
             {/* Info */}
+
             <div
                 className="px-5 pt-4 pb-5 flex flex-col gap-2 flex-1"
                 style={{
@@ -95,52 +130,70 @@ const TarjetaPlato = ({ plato, visible }) => {
 };
 
 // ─────────────────────────────
-// Componente principal
+// COMPONENTE PRINCIPAL
 // ─────────────────────────────
 
 const SeccionPlatos = () => {
-    const [categoriaActiva, setCategoriaActiva] = useState(0);
+
+    const [categoriaActiva, setCategoriaActiva] =
+        useState(0);
 
     const [platos, setPlatos] = useState([]);
 
-    const [categorias, setCategorias] = useState([]);
+    const [categorias, setCategorias] =
+        useState([]);
 
-    const [cargando, setCargando] = useState(true);
+    const [cargando, setCargando] =
+        useState(true);
 
     const [error, setError] = useState(null);
 
-    const [visibles, setVisibles] = useState([]);
+    const [visibles, setVisibles] =
+        useState([]);
+
+    const [favoritos, setFavoritos] =
+        useState([]);
 
     const gridRef = useRef(null);
 
+    const usuario = JSON.parse(
+        localStorage.getItem("usuario")
+    );
+
     // ─────────────────────────────
-    // Cargar datos
+    // CARGAR PLATOS Y CATEGORÍAS
     // ─────────────────────────────
 
     useEffect(() => {
+
         const cargar = async () => {
+
             setCargando(true);
 
             setError(null);
 
             try {
-                const [resPlatos, resCat] = await Promise.all([
-                    fetch(`${API_BASE}/plato/listarplatos`),
 
-                    fetch(
-                        `${API_BASE}/categoria/listarcategorias`,
-                    ),
-                ]);
+                const [resPlatos, resCat] =
+                    await Promise.all([
+                        fetch(
+                            `${API_BASE}/plato/listarplatos`
+                        ),
+
+                        fetch(
+                            `${API_BASE}/categoria/listarcategorias`
+                        ),
+                    ]);
 
                 if (!resPlatos.ok) {
                     throw new Error(
-                        `Platos: ${resPlatos.status}`,
+                        `Platos: ${resPlatos.status}`
                     );
                 }
 
                 if (!resCat.ok) {
                     throw new Error(
-                        `Categorías: ${resCat.status}`,
+                        `Categorías: ${resCat.status}`
                     );
                 }
 
@@ -153,25 +206,114 @@ const SeccionPlatos = () => {
                 setPlatos(platosData);
 
                 setCategorias(categoriasData);
+
             } catch (e) {
+
                 console.error(
                     "Error cargando datos:",
-                    e,
+                    e
                 );
 
                 setError(
-                    "No se pudo conectar con el servidor.",
+                    "No se pudo conectar con el servidor."
                 );
+
             } finally {
+
                 setCargando(false);
             }
         };
 
         cargar();
+
     }, []);
 
     // ─────────────────────────────
-    // Filtrar platos
+    // CARGAR FAVORITOS
+    // ─────────────────────────────
+
+    useEffect(() => {
+
+        const cargarFavoritos = async () => {
+
+            if (!usuario) return;
+
+            try {
+
+                const data =
+                    await obtenerFavoritosUsuario(
+                        usuario.idUsuario
+                    );
+
+                setFavoritos(data);
+
+            } catch (error) {
+
+                console.error(error);
+            }
+        };
+
+        cargarFavoritos();
+
+    }, []);
+
+    // ─────────────────────────────
+    // TOGGLE FAVORITO
+    // ─────────────────────────────
+
+    const toggleFavorito = async (idPlato) => {
+
+        if (!usuario) {
+
+            alert("Debes iniciar sesión");
+
+            return;
+        }
+
+        const existe = favoritos.find(
+            (f) => f.idPlato === idPlato
+        );
+
+        try {
+
+            if (existe) {
+
+                await eliminarFavoritoUsuarioPlato(
+                    usuario.idUsuario,
+                    idPlato
+                );
+
+                setFavoritos(
+                    favoritos.filter(
+                        (f) =>
+                            f.idPlato !== idPlato
+                    )
+                );
+
+            } else {
+
+                const nuevo =
+                    await guardarFavorito({
+                        idUsuario:
+                            usuario.idUsuario,
+
+                        idPlato,
+                    });
+
+                setFavoritos([
+                    ...favoritos,
+                    nuevo,
+                ]);
+            }
+
+        } catch (error) {
+
+            console.error(error);
+        }
+    };
+
+    // ─────────────────────────────
+    // FILTRAR
     // ─────────────────────────────
 
     const platosFiltrados =
@@ -179,41 +321,38 @@ const SeccionPlatos = () => {
             ? platos
             : platos.filter(
                 (p) =>
-                    p.idCategoria === categoriaActiva,
+                    p.idCategoria ===
+                    categoriaActiva
             );
 
     // ─────────────────────────────
-    // Animaciones
+    // ANIMACIONES
     // ─────────────────────────────
 
     useEffect(() => {
-        // Evitar setState síncrono en el cuerpo del efecto:
-        // programar la limpieza inicial de `visibles` de forma asíncrona.
-        const resetTimer = setTimeout(() => {
-            setVisibles([]);
-        }, 0);
 
-        if (platosFiltrados.length === 0) {
-            return () => {
-                clearTimeout(resetTimer);
-            };
-        }
+        setVisibles([]);
 
-        const timers = platosFiltrados.map((plato, i) => {
-            return setTimeout(() => {
-                setVisibles((prev) => [...prev, i]);
-            }, i * 75);
-        });
+        if (platosFiltrados.length === 0)
+            return;
 
-        return () => {
-            clearTimeout(resetTimer);
-            timers.forEach((timer) => clearTimeout(timer));
-        };
+        const timers = platosFiltrados.map(
+            (_, i) =>
+                setTimeout(() => {
+                    setVisibles((prev) => [
+                        ...prev,
+                        i,
+                    ]);
+                }, i * 75)
+        );
 
-    }, [categoriaActiva, cargando, platosFiltrados]);
+        return () =>
+            timers.forEach(clearTimeout);
+
+    }, [categoriaActiva, cargando]);
 
     // ─────────────────────────────
-    // Render
+    // RENDER
     // ─────────────────────────────
 
     return (
@@ -224,19 +363,21 @@ const SeccionPlatos = () => {
                 className="min-h-screen pt-24 pb-20 px-6"
                 style={{
                     backgroundColor: "#FDDCB5",
-                    fontFamily: "'Nunito', sans-serif",
+                    fontFamily:
+                        "'Nunito', sans-serif",
                 }}
             >
                 <div className="max-w-5xl mx-auto">
-                    {/* Encabezado */}
+
+                    {/* HEADER */}
 
                     <div className="mb-8">
-                        {/* Icono */}
 
                         <div
                             className="w-14 h-14 rounded-full flex items-center justify-center mb-5"
                             style={{
-                                backgroundColor: "#F97316",
+                                backgroundColor:
+                                    "#F97316",
                             }}
                         >
                             <svg
@@ -266,30 +407,37 @@ const SeccionPlatos = () => {
                         </p>
                     </div>
 
-                    {/* Contenedor */}
+                    {/* CONTENEDOR */}
 
                     <div className="bg-white rounded-3xl p-6 shadow-[0_4px_32px_rgba(0,0,0,0.08)]">
-                        {/* Categorías */}
+
+                        {/* CATEGORÍAS */}
 
                         {categorias.length > 0 && (
+
                             <div className="flex gap-2 flex-wrap mb-6">
+
                                 {[
                                     {
                                         idCategoria: 0,
                                         nombre: "Todos",
                                     },
+
                                     ...categorias,
                                 ].map((cat) => {
+
                                     const activa =
                                         cat.idCategoria ===
                                         categoriaActiva;
 
                                     return (
                                         <button
-                                            key={cat.idCategoria}
+                                            key={
+                                                cat.idCategoria
+                                            }
                                             onClick={() =>
                                                 setCategoriaActiva(
-                                                    cat.idCategoria,
+                                                    cat.idCategoria
                                                 )
                                             }
                                             className={[
@@ -300,13 +448,6 @@ const SeccionPlatos = () => {
                                                     : "bg-orange-50 text-orange-400 hover:bg-orange-100",
                                             ].join(" ")}
                                             style={{
-                                                fontFamily:
-                                                    "'Nunito', sans-serif",
-
-                                                border: "none",
-
-                                                cursor: "pointer",
-
                                                 backgroundColor:
                                                     activa
                                                         ? "#F97316"
@@ -320,61 +461,21 @@ const SeccionPlatos = () => {
                             </div>
                         )}
 
-                        {/* Loading */}
+                        {/* LOADING */}
 
                         {cargando ? (
-                            <div className="flex flex-col items-center justify-center min-h-[260px] gap-4">
-                                <div className="spinner w-9 h-9 rounded-full border-4 border-orange-100 border-t-orange-400" />
 
-                                <span
-                                    className="text-sm text-gray-400"
-                                    style={{
-                                        fontFamily:
-                                            "'Nunito', sans-serif",
-                                    }}
-                                >
-                                    Cargando platos...
-                                </span>
+                            <div className="flex justify-center py-20">
+                                <div className="spinner w-10 h-10 rounded-full border-4 border-orange-100 border-t-orange-400" />
                             </div>
+
                         ) : error ? (
-                            // Error
 
-                            <div className="flex flex-col items-center justify-center min-h-[260px] gap-4">
-                                <p className="text-sm text-red-400">
-                                    {error}
-                                </p>
-
-                                <button
-                                    onClick={() =>
-                                        window.location.reload()
-                                    }
-                                    className="px-5 py-2 rounded-xl text-white text-xs font-bold transition-colors duration-200"
-                                    style={{
-                                        backgroundColor: "#F97316",
-
-                                        border: "none",
-
-                                        cursor: "pointer",
-
-                                        fontFamily:
-                                            "'Nunito', sans-serif",
-                                    }}
-                                >
-                                    Reintentar
-                                </button>
+                            <div className="text-center py-20 text-red-400">
+                                {error}
                             </div>
-                        ) : platosFiltrados.length ===
-                            0 ? (
-                            // Sin platos
 
-                            <div className="text-center py-16">
-                                <p className="text-gray-400 text-sm">
-                                    No hay platos en esta
-                                    categoría aún.
-                                </p>
-                            </div>
                         ) : (
-                            // Grid platos
 
                             <div
                                 ref={gridRef}
@@ -386,14 +487,17 @@ const SeccionPlatos = () => {
                             >
                                 {platosFiltrados.map(
                                     (plato, i) => (
+
                                         <TarjetaPlato
-                                            key={plato.idPlato}
+                                            key={
+                                                plato.idPlato
+                                            }
                                             plato={plato}
-                                            visible={visibles.includes(
-                                                i,
-                                            )}
+                                            visible={visibles.includes(i)}
+                                            favoritos={favoritos}
+                                            toggleFavorito={toggleFavorito}
                                         />
-                                    ),
+                                    )
                                 )}
                             </div>
                         )}
