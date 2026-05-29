@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 
 import Register from "./Pages/Register";
 import Login from "./Pages/Login";
@@ -11,49 +11,53 @@ import AdminPlato from "./Pages/Admin/AdminPlato";
 import CrearPlato from "./Pages/Admin/CrearPlato";
 import EditarPlato from "./Pages/Admin/EditarPlato";
 import Profile from "./Pages/Profile";
+import AdminGenero from "./Pages/Admin/AdminGenero";
+import PrivateRouteAdmin from "./Routes/PrivateRouteAdmin";
+import MisFavoritos from "./Pages/misFavoritos";
 
+function PrivateRoute({ children }) {
+    const usuario = JSON.parse(localStorage.getItem("usuario"));
+    return usuario ? children : <Navigate to="/login" />;
+}
 
 function App() {
     return (
         <BrowserRouter>
             <Routes>
+
                 <Route path="/login" element={<Login />} />
+                <Route path="/register" element={<Register />} />
 
-                <Route
-                    path="/register"
-                    element={<Register />}
-                />
+                <Route path="/" element={<MainLayout />}>
 
-                <Route
-                    path="/"
-                    element={<MainLayout />}
-                >
+                    <Route index element={<Home />} />
+
+                    <Route path="reserva" element={<Reserva />} />
+
+                    <Route path="admin/platos" element={<AdminPlato />} />
+                    <Route path="admin/crearplato" element={<CrearPlato />} />
+                    <Route path="admin/editarplato/:id" element={<EditarPlato />} />
+
+                    <Route path="perfil" element={<Profile />} />
+
+                    {/* 🔐 PROTEGIDO */}
                     <Route
-                        index
-                        element={<Home />}
+                        path="favoritos"
+                        element={
+                            <PrivateRoute>
+                                <MisFavoritos />
+                            </PrivateRoute>
+                        }
+
                     />
 
                     <Route
-                        path="reserva"
-                        element={<Reserva />}
-                    />
-
-                    <Route
-                        path="admin/platos"
-                        element={<AdminPlato />}
-                    />
-
-                    <Route
-                        path="admin/crearplato"
-                        element={<CrearPlato />}
-                    />
-                    <Route
-                        path="admin/editarplato/:id"
-                        element={<EditarPlato />}
-                    />
-                    <Route
-                        path="perfil"
-                        element={<Profile />}
+                        path="admin/generos"
+                        element={
+                            <PrivateRouteAdmin>
+                                <AdminGenero />
+                            </PrivateRouteAdmin>
+                        }
                     />
                 </Route>
             </Routes>

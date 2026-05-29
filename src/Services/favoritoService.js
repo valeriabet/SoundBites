@@ -3,7 +3,6 @@
 // LISTAR FAVORITOS
 
 export const listarFavoritos = async () => {
-
     const res = await fetch(
         `${API}/listarfavoritos`
     );
@@ -18,7 +17,7 @@ export const guardarFavorito = async (
 ) => {
 
     const res = await fetch(
-        `${API}/Guardarfavorito`,
+        `${API}/guardarfavorito`,
         {
             method: "POST",
 
@@ -59,28 +58,3 @@ export const buscarFavorito = async (
 
     return await res.json();
 };
-
-// OBTENER FAVORITOS POR USUARIO
-
-export const obtenerFavoritosUsuario =
-    async (idUsuario) => {
-
-        const res = await fetch(
-            `${API}/usuario/${idUsuario}`
-        );
-
-        return await res.json();
-    };
-
-// ELIMINAR FAVORITO POR USUARIO Y PLATO
-
-export const eliminarFavoritoUsuarioPlato =
-    async (idUsuario, idPlato) => {
-
-        await fetch(
-            `${API}/eliminarfavorito?idUsuario=${idUsuario}&idPlato=${idPlato}`,
-            {
-                method: "DELETE",
-            }
-        );
-    };

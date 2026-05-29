@@ -7,5 +7,8 @@
         public DateTime? Fecha { get; set; }
         public int NumeroPersonas { get; set; }
         public int IdGenero { get; set; }
+
+        // Navigation property to Genero
+        public virtual Genero? Genero { get; set; }
     }
 }

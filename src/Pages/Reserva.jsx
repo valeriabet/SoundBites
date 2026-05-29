@@ -71,18 +71,32 @@ const Reserva = () => {
 
     // Encontrar idGenero a partir del select (genero guarda id)
     const idGenero = Number(genero);
+    const genObj = generos.find(g => Number(g.idGenero) === idGenero);
 
-    const reserva = {
-      idUsuario: usuario.idUsuario,
+    if (!idGenero && !genObj) {
+      setError('Selecciona un género válido');
+      return;
+    }
+
+    // Validar numeroPersonas
+    const np = Number(numeroPersonas) || 1;
+    if (np < 1 || np > 8) {
+      setError('Número de personas debe ser entre 1 y 8');
+      return;
+    }
+
+    const reservaDto = {
+      idUsuario: usuario.idUsuario ?? usuario.IdUsuario,
       fecha: fechaHora,
-      numeroPersonas: Number(numeroPersonas),
-      idGenero: idGenero,
+      numeroPersonas: np,
+      idGenero: idGenero || 0,
+      generoNombre: genObj ? genObj.nombre : "",
     };
 
     // Enviar al backend
     (async () => {
       try {
-        await crearReserva(reserva);
+        await crearReserva(reservaDto);
         setEnviado(true);
       } catch (error) {
         console.error('Error al crear reserva', error);

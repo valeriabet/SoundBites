@@ -110,6 +110,11 @@ public partial class AppDbContext : DbContext
                 .HasColumnName("fecha");
             entity.Property(e => e.NumeroPersonas).HasColumnName("numero_personas");
             entity.Property(e => e.IdGenero).HasColumnName("id_genero");
+
+            entity.HasOne(d => d.Genero)
+                .WithMany()
+                .HasForeignKey(d => d.IdGenero)
+                .HasConstraintName("FK_Reservas_Generos");
         });
 
         OnModelCreatingPartial(modelBuilder);

@@ -65,12 +65,12 @@ const Profile = () => {
           <ul className="space-y-4">
             {reservas.map(r => {
               const idGen = r.idGenero ?? r.IdGenero;
-              const genObj = generos.find(g => Number(g.idGenero) === Number(idGen));
+                const genObj = generos.find(g => Number(g.idGenero) === Number(idGen));
               return (
                 <li key={r.idReserva} className="border rounded-lg p-4">
                   <p><strong>Fecha:</strong> {r.fecha ? new Date(r.fecha).toLocaleString() : '—'}</p>
                   <p><strong>Nº personas:</strong> {r.numeroPersonas ?? r.NumeroPersonas}</p>
-                  <p><strong>Género:</strong> {genObj.nombre}</p>
+                  <p><strong>Género:</strong> {genObj?.nombre || '—'}</ p>
                   <div className="mt-3 flex gap-2">
                     <button
                       className="bg-red-500 text-white px-3 py-1 rounded"
