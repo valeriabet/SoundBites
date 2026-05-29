@@ -1,3 +1,27 @@
+/*
+PSEUDOCÓDIGO (plan detallado):
+
+- Objetivo: evitar llamar a setVisibles([]) de forma síncrona dentro de un useEffect
+  para resolver la regla ESLint `react-hooks/set-state-in-effect`.
+- Estrategia:
+  1. En lugar de limpiar el estado inmediatamente en el cuerpo del efecto,
+     programar la limpieza de forma asíncrona usando `setTimeout(..., 0)`.
+     Esto evita una actualización de estado síncrona dentro del efecto.
+  2. Dentro de ese `setTimeout`:
+     - establecer `setVisibles([])` para reiniciar el estado.
+     - si no hay elementos, salir.
+     - programar una serie de `setTimeout` escalonados (i * 75 ms) para
+       añadir progresivamente los índices a `visibles`.
+     - guardar los IDs de timeout en un array para poder limpiarlos.
+  3. En la función de limpieza del efecto:
+     - cancelar el timeout de reinicio (resetTimer).
+     - cancelar todos los timeouts escalonados.
+  4. Añadir `platosFiltrados.length` a las dependencias para garantizar que
+     el efecto se vuelva a ejecutar cuando cambie la cantidad de platos.
+- Resultado: no se llama a setState de forma síncrona dentro del efecto,
+  resolviendo la advertencia de ESLint y manteniendo la animación de aparición.
+*/
+
 import { useState, useEffect, useRef } from "react";
 
 import {
@@ -338,36 +362,26 @@ const SeccionPlatos = () => {
     // ─────────────────────────────
 
     useEffect(() => {
+        // Evitar setState síncrono dentro del efecto.
+        // Programamos la limpieza y el inicio de la animación de forma asíncrona.
+        let staggerTimers = [];
+        const resetTimer = setTimeout(() => {
+            setVisibles([]);
 
-        setVisibles([]);
+            if (platosFiltrados.length === 0) return;
 
-        if (
-            platosFiltrados.length === 0
-        ) return;
-
-        const timers =
-            platosFiltrados.map(
-                (_, i) =>
-                    setTimeout(() => {
-                        setVisibles(
-                            (prev) => [
-                                ...prev,
-                                i,
-                            ]
-                        );
-                    }, i * 75)
+            staggerTimers = platosFiltrados.map((_, i) =>
+                setTimeout(() => {
+                    setVisibles((prev) => [...prev, i]);
+                }, i * 75)
             );
+        }, 0);
 
         return () => {
-            timers.forEach(
-                clearTimeout
-            );
+            clearTimeout(resetTimer);
+            staggerTimers.forEach(clearTimeout);
         };
-
-    }, [
-        categoriaActiva,
-        cargando,
-    ]);
+    }, [categoriaActiva, cargando, platosFiltrados.length]);
 
     // ─────────────────────────────
     // RENDER

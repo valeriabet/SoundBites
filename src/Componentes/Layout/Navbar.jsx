@@ -94,6 +94,8 @@ const Navbar = () => {
                                                   }`
                                               }
                                           >
+
+
                                               Favoritos
                                           </NavLink>
 

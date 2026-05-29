@@ -12,7 +12,7 @@ import CrearPlato from "./Pages/Admin/CrearPlato";
 import EditarPlato from "./Pages/Admin/EditarPlato";
 import Profile from "./Pages/Profile";
 import AdminGenero from "./Pages/Admin/AdminGenero";
-
+import PrivateRouteAdmin from "./Routes/PrivateRouteAdmin";
 import MisFavoritos from "./Pages/misFavoritos";
 
 function PrivateRoute({ children }) {
@@ -51,8 +51,14 @@ function App() {
 
                     />
 
-                    <Route path="admin/generos" element={<AdminGenero />} />
-
+                    <Route
+                        path="admin/generos"
+                        element={
+                            <PrivateRouteAdmin>
+                                <AdminGenero />
+                            </PrivateRouteAdmin>
+                        }
+                    />
                 </Route>
             </Routes>
         </BrowserRouter>

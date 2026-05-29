@@ -3,28 +3,25 @@ import {
     listarGeneros,
     crearGenero,
     eliminarGenero,
+    editarGenero,
 } from "../../Services/generoService";
 
 const AdminGenero = () => {
 
     const [generos, setGeneros] = useState([]);
     const [nombre, setNombre] = useState("");
+    const [editandoId, setEditandoId] = useState(null);
 
+    // Cargar géneros al montar
     useEffect(() => {
-        // Plan:
-        // 1. Evitar llamar a `cargarGeneros()` directamente desde el efecto (porque llama a setState
-        //    de forma síncrona dentro del efecto).
-        // 2. Hacer la petición dentro del propio efecto con una función async.
-        // 3. Usar una bandera `mounted` para evitar setState si el componente se desmonta.
-        // 4. Manejar errores con try/catch para depuración.
         let mounted = true;
 
         const fetchGeneros = async () => {
             try {
                 const data = await listarGeneros();
                 if (mounted) setGeneros(data);
-            } catch (error) {
-                console.error("Error cargando géneros:", error);
+            } catch (err) {
+                console.error(err);
             }
         };
 
@@ -38,60 +35,103 @@ const AdminGenero = () => {
     const guardar = async () => {
         if (!nombre.trim()) return;
 
-        await crearGenero({ nombre });
+        try {
+            if (editandoId !== null) {
+                await editarGenero(editandoId, { nombre });
+            } else {
+                await crearGenero({ nombre });
+            }
 
-        setNombre("");
+            setNombre("");
+            setEditandoId(null);
+
+            // Actualizar la lista tras crear/editar
+            const data = await listarGeneros();
+            setGeneros(data);
+        } catch (err) {
+            console.error(err);
+        }
     };
 
     const eliminar = async (id) => {
-        await eliminarGenero(id);
-        // Usar actualización funcional para evitar problemas con cierres sobre `generos`
-        setGeneros((prev) => prev.filter(g => g.idGenero !== id));
+        try {
+            await eliminarGenero(id);
+            // Usar actualización funcional para evitar estados stale
+            setGeneros((prev) => prev.filter((g) => g.idGenero !== id));
+        } catch (err) {
+            console.error(err);
+        }
+    };
+
+    const editar = (g) => {
+        setNombre(g.nombre);
+        setEditandoId(g.idGenero);
     };
 
     return (
-        <div className="p-6">
+        <div className="min-h-screen bg-gray-50 p-8">
 
-            <h1 className="text-2xl font-bold mb-4">
-                Administración de Géneros
-            </h1>
+            <div className="max-w-3xl mx-auto">
 
-            {/* CREAR */}
-            <div className="flex gap-2 mb-6">
-                <input
-                    value={nombre}
-                    onChange={(e) => setNombre(e.target.value)}
-                    placeholder="Nombre del género"
-                    className="border p-2 rounded w-full"
-                />
+                <h1 className="text-3xl font-bold mb-6">
+                     Panel Admin - Géneros
+                </h1>
 
-                <button
-                    onClick={guardar}
-                    className="bg-green-500 text-white px-4 rounded"
-                >
-                    Crear
-                </button>
-            </div>
+                {/* FORM */}
+                <div className="bg-white p-4 rounded-xl shadow flex gap-2 mb-6">
 
-            {/* LISTAR */}
-            <div className="grid gap-3">
-                {generos.map((g) => (
-                    <div
-                        key={g.idGenero}
-                        className="flex justify-between bg-white p-3 rounded shadow"
+                    <input
+                        value={nombre}
+                        onChange={(e) => setNombre(e.target.value)}
+                        placeholder="Nombre del género"
+                        className="border p-2 rounded w-full"
+                    />
+
+                    <button
+                        onClick={guardar}
+                        className={`px-4 py-2 rounded text-white ${editandoId ? "bg-blue-500" : "bg-green-500"
+                            }`}
                     >
-                        <span>{g.nombre}</span>
+                        {editandoId ? "Actualizar" : "Crear"}
+                    </button>
+                </div>
 
-                        <button
-                            onClick={() => eliminar(g.idGenero)}
-                            className="bg-red-500 text-white px-3 py-1 rounded"
+                {/* LISTA */}
+                <div className="space-y-3">
+
+                    {generos.map((g) => (
+                        <div
+                            key={g.idGenero}
+                            className="bg-white p-4 rounded-xl shadow flex justify-between items-center"
                         >
-                            Eliminar
-                        </button>
-                    </div>
-                ))}
-            </div>
 
+                            <span className="font-medium">
+                                {g.nombre}
+                            </span>
+
+                            <div className="flex gap-2">
+
+                                <button
+                                    onClick={() => editar(g)}
+                                    className="bg-yellow-400 px-3 py-1 rounded"
+                                >
+                                    Editar
+                                </button>
+
+                                <button
+                                    onClick={() => eliminar(g.idGenero)}
+                                    className="bg-red-500 text-white px-3 py-1 rounded"
+                                >
+                                    Eliminar
+                                </button>
+
+                            </div>
+                        </div>
+                    ))}
+
+                </div>
+
+            </div>
         </div>
     );
 };

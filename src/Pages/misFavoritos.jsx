@@ -16,42 +16,45 @@ const MisFavoritos = () => {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
 
     useEffect(() => {
-        if (usuario) {
-            cargarDatos();
-        }
-    }, []);
+        if (!usuario) return;
 
-    const cargarDatos = async () => {
-        try {
-            const [favoritosData, platosData] = await Promise.all([
-                listarFavoritos(),
-                fetch(API_PLATOS).then(r => {
-                    if (!r.ok) throw new Error("Error cargando platos");
-                    return r.json();
-                }),
-            ]);
+        let mounted = true;
 
-            const favoritosUsuario = favoritosData.filter(
-                (f) => f.idUsuario === usuario.idUsuario
-            );
+        const cargarDatos = async () => {
+            try {
+                const [favoritosData, platosData] = await Promise.all([
+                    listarFavoritos(),
+                    fetch(API_PLATOS).then((r) => {
+                        if (!r.ok) throw new Error("Error cargando platos");
+                        return r.json();
+                    }),
+                ]);
 
-            setFavoritos(favoritosUsuario);
-            setPlatos(platosData);
+                const favoritosUsuario = favoritosData.filter(
+                    (f) => f.idUsuario === usuario.idUsuario
+                );
 
-        } catch (error) {
-            console.error(error);
-        }
-    };
+                if (mounted) {
+                    setFavoritos(favoritosUsuario);
+                    setPlatos(platosData);
+                }
+            } catch (error) {
+                console.error(error);
+            }
+        };
+
+        cargarDatos();
+
+        return () => {
+            mounted = false;
+        };
+    }, [usuario]);
 
     const quitarFavorito = async (idFavorito) => {
         try {
             await eliminarFavorito(idFavorito);
 
-            setFavoritos(
-                favoritos.filter(
-                    (f) => f.idFavorito !== idFavorito
-                )
-            );
+            setFavoritos((prev) => prev.filter((f) => f.idFavorito !== idFavorito));
 
         } catch (error) {
             console.error(error);
