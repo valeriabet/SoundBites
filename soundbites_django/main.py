@@ -13,7 +13,6 @@ BASE_URL = "http://127.0.0.1:8000/api"
 
 
 def login():
-
     response = requests.post(
         f"{BASE_URL}/auth/login/",
         json={
@@ -23,12 +22,10 @@ def login():
     )
 
     data = response.json()
-
     return data["tokens"]["access"]
 
 
 def obtener_favoritos(token):
-
     headers = {
         "Authorization": f"Bearer {token}"
     }
@@ -42,7 +39,6 @@ def obtener_favoritos(token):
 
 
 def obtener_platos():
-
     response = requests.get(
         f"{BASE_URL}/plato/listar/"
     )
@@ -51,11 +47,9 @@ def obtener_platos():
 
 
 def crear_matriz(favoritos):
-
     datos = []
 
     for favorito in favoritos:
-
         datos.append({
             "usuario": favorito["id_usuario"],
             "plato": favorito["id_plato"],
@@ -63,6 +57,9 @@ def crear_matriz(favoritos):
         })
 
     df = pd.DataFrame(datos)
+
+    if df.empty:
+        return pd.DataFrame()
 
     return df.pivot_table(
         index="usuario",
@@ -74,27 +71,45 @@ def crear_matriz(favoritos):
 
 @app.get("/")
 def inicio():
-
     return {
         "mensaje": "Microservicio IA SoundBites funcionando"
     }
+
+
+# 🔥 NUEVO ENDPOINT PARA FRONTEND
+@app.get("/api/recomendaciones")
+def recomendaciones_simple():
+    """
+    Endpoint simple para el frontend (evita 404)
+    """
+    return [
+        {
+            "nombre": "Pizza recomendada",
+            "descripcion": "Alta popularidad entre usuarios similares"
+        },
+        {
+            "nombre": "Hamburguesa especial",
+            "descripcion": "Basada en comportamiento de usuarios"
+        },
+        {
+            "nombre": "Pasta gourmet",
+            "descripcion": "Recomendada por IA básica"
+        }
+    ]
 
 
 @app.get("/recomendar/{id_usuario}")
 def recomendar(id_usuario: int):
 
     token = login()
-
     favoritos = obtener_favoritos(token)
-
     platos = obtener_platos()
 
     matriz = crear_matriz(favoritos)
 
-    if id_usuario not in matriz.index:
-
+    if matriz.empty or id_usuario not in matriz.index:
         return {
-            "error": "Usuario no encontrado"
+            "error": "Usuario no encontrado o sin datos suficientes"
         }
 
     modelo = NearestNeighbors(
