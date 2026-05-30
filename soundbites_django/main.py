@@ -169,3 +169,6 @@ def recomendar(id_usuario: int):
         "usuario": id_usuario,
         "recomendaciones": resultado[:5]
     }
+    
+if __name__ == "__main__":
+    menu()
