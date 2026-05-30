@@ -9,6 +9,8 @@ __pycache__/
 python-env/
 venv/
 ENV/
+.vite/
+node_modules/
 .venv/
 
 # Django
