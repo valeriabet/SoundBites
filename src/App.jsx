@@ -14,6 +14,7 @@ import Profile from "./Pages/Profile";
 import AdminGenero from "./Pages/Admin/AdminGenero";
 import PrivateRouteAdmin from "./Routes/PrivateRouteAdmin";
 import MisFavoritos from "./Pages/misFavoritos";
+import Recomendaciones from "./Pages/recomendaciones";
 
 function PrivateRoute({ children }) {
     const usuario = JSON.parse(localStorage.getItem("usuario"));
@@ -49,6 +50,15 @@ function App() {
                             </PrivateRoute>
                         }
 
+                    />
+
+                    <Route
+                        path="recomendaciones"
+                        element={
+                            <PrivateRoute>
+                                <Recomendaciones />
+                            </PrivateRoute>
+                        }
                     />
 
                     <Route
