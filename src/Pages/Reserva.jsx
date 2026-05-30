@@ -2,7 +2,6 @@ import { useEffect, useState } from "react";
 import { useLocation, useNavigate, Link } from "react-router-dom";
 import { MdMusicNote } from "react-icons/md";
 import { crearReserva } from "../Services/reservaService";
-
 // Generos se obtendrán desde la API
 
 const HORAS = [
@@ -36,20 +35,18 @@ const Reserva = () => {
   const [error, setError] = useState("");
 
   const hoy = new Date().toISOString().split("T")[0];
-
-  useEffect(() => {
-    const cargarGeneros = async () => {
-      try {
-        const res = await fetch("https://localhost:7117/api/genero/listargeneros");
-        const data = await res.json();
-        setGeneros(data);
-      } catch (error) {
-        console.error('Error al cargar géneros', error);
-      }
-    };
-
-    cargarGeneros();
-  }, []);
+    useEffect(() => {
+        const cargarGeneros = async () => {
+            try {
+                const res = await fetch("http://localhost:8000/api/genero/listar/");
+                const data = await res.json();
+                setGeneros(data);
+            } catch (error) {
+                console.error('Error al cargar géneros', error);
+            }
+        };
+        cargarGeneros();
+    }, []);
 
   const handleSubmit = (e) => {
     e.preventDefault();
@@ -61,7 +58,7 @@ const Reserva = () => {
 
     // Usuario logueado requerido
     const usuario = JSON.parse(localStorage.getItem('usuario') || 'null');
-    if (!usuario || !usuario.idUsuario) {
+    if (!usuario || !usuario.id_usuario) {
       setError('Debes iniciar sesión para reservar');
       return;
     }
@@ -71,9 +68,8 @@ const Reserva = () => {
 
     // Encontrar idGenero a partir del select (genero guarda id)
     const idGenero = Number(genero);
-    const genObj = generos.find(g => Number(g.idGenero) === idGenero);
-
-    if (!idGenero && !genObj) {
+      const genObj = generos.find(g => Number(g.id_genero) === idGenero);
+    if (!idGenero) {
       setError('Selecciona un género válido');
       return;
     }
@@ -84,15 +80,12 @@ const Reserva = () => {
       setError('Número de personas debe ser entre 1 y 8');
       return;
     }
-
-    const reservaDto = {
-      idUsuario: usuario.idUsuario ?? usuario.IdUsuario,
-      fecha: fechaHora,
-      numeroPersonas: np,
-      idGenero: idGenero || 0,
-      generoNombre: genObj ? genObj.nombre : "",
-    };
-
+      const reservaDto = {
+          id_usuario: usuario.id_usuario,
+          fecha: fechaHora,
+          numero_personas: np,
+          id_genero: idGenero || 0,
+      };
     // Enviar al backend
     (async () => {
       try {
@@ -237,7 +230,7 @@ const Reserva = () => {
             >
               <option value="">Selecciona género</option>
               {generos.map(g => (
-                <option key={g.idGenero} value={g.idGenero}>{g.nombre}</option>
+                <option key={g.id_genero} value={g.id_genero}>{g.nombre}</option>
               ))}
             </select>
           </div>

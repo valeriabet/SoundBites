@@ -13,75 +13,31 @@ function Login() {
 
     const handleLogin = async () => {
         try {
-            const response = await fetch("https://localhost:7117/api/usuario/login", {
+            const response = await fetch(`${import.meta.env.VITE_API_URL}/api/auth/login/`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ correo, contrasena }),
             });
 
-            // Leer como texto para manejar respuestas no JSON sin romper
-            const text = await response.text();
-            let usuario = null;
-            if (text) {
-                try {
-                    usuario = JSON.parse(text);
-                } catch (e) {
-                    console.error("No se pudo parsear respuesta de login:", e, text);
-                }
-            }
+            const data = await response.json();
 
             if (!response.ok) {
-                console.error("Error en login:", response.status, text);
-                alert("Correo o contraseña incorrectos");
+                alert(data.error || "Correo o contraseña incorrectos");
                 return;
             }
 
-            if (!usuario) {
-                console.error("Respuesta de login válida pero sin usuario:", text);
-                alert("Error al procesar la respuesta del servidor");
-                return;
-            }
+            localStorage.setItem("access_token", data.tokens.access);
+            localStorage.setItem("refresh_token", data.tokens.refresh);
+            localStorage.setItem("usuario", JSON.stringify(data.usuario));
 
-            // Normalizar campos que pueden venir con distintos nombres/casing
-            const normalized = {
-                idUsuario:
-                    usuario.idUsuario ??
-                    usuario.IdUsuario ??
-                    usuario.id ??
-                    usuario.Id ??
-                    null,
-                nombre:
-                    usuario.nombre ??
-                    usuario.Nombre ??
-                    usuario.nombreUsuario ??
-                    usuario.NombreUsuario ??
-                    "",
-                correo:
-                    usuario.correo ??
-                    usuario.Correo ??
-                    usuario.email ??
-                    usuario.Email ??
-                    correo,
-                rol: (usuario.rol ?? usuario.Rol ?? usuario.role ?? "user").toString(),
-                ...usuario,
-            };
-
-            // Guardar usuario normalizado en localStorage
-            try {
-                localStorage.setItem("usuario", JSON.stringify(normalized));
-            } catch (e) {
-                console.error("No se pudo guardar usuario en localStorage:", e);
-            }
-
-            // Navegar de forma segura según rol
-            if ((normalized.rol || "").toString().toLowerCase() === "admin") {
+            if ((data.usuario.rol || "").toLowerCase() === "admin") {
                 navigate("/admin/platos");
             } else {
                 navigate("/");
             }
         } catch (error) {
-            console.error("Error en la petición de login:", error);
-            alert("Error al iniciar sesión. Revisa la consola para más detalles.");
+            console.error("Error en login:", error);
+            alert("Error al iniciar sesión.");
         }
     };
 
