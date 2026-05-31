@@ -119,6 +119,15 @@ const Navbar = () => {
                     >
                       Generos
                     </NavLink>
+                    <NavLink
+                      to="/admin/categorias"
+                      onClick={() => setAdminOpen(false)}
+                      className={({ isActive }) =>
+                        `block px-4 py-2 text-sm hover:bg-orange-100 ${isActive ? "bg-orange-200" : ""}`
+                      }
+                    >
+                      Categorías
+                    </NavLink>
                   </div>
                 )}
               </div>

@@ -12,6 +12,7 @@ import CrearPlato from "./Pages/Admin/CrearPlato";
 import EditarPlato from "./Pages/Admin/EditarPlato";
 import Profile from "./Pages/Profile";
 import AdminGenero from "./Pages/Admin/AdminGenero";
+import AdminCategoria from "./Pages/Admin/AdminCategoria";
 import PrivateRouteAdmin from "./Routes/PrivateRouteAdmin";
 import MisFavoritos from "./Pages/misFavoritos";
 import Recomendaciones from "./Pages/recomendaciones";
@@ -66,6 +67,14 @@ function App() {
                         element={
                             <PrivateRouteAdmin>
                                 <AdminGenero />
+                            </PrivateRouteAdmin>
+                        }
+                    />
+                    <Route
+                        path="admin/categorias"
+                        element={
+                            <PrivateRouteAdmin>
+                                <AdminCategoria />
                             </PrivateRouteAdmin>
                         }
                     />

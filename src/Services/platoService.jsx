@@ -1,4 +1,4 @@
-﻿const API_URL = import.meta.env.VITE_API_URL + "/api";
+﻿const API = import.meta.env.VITE_API_URL + "/api/plato";
 
 const getHeaders = () => ({
     "Content-Type": "application/json",
@@ -6,18 +6,18 @@ const getHeaders = () => ({
 });
 
 export const obtenerPlatos = async () => {
-    const res = await fetch(`${API_URL}/plato/listar/`);
+    const res = await fetch(`${API}/listar/`);
     return await res.json();
 };
 
 export const obtenerPlatoPorId = async (id) => {
-    const res = await fetch(`${API_URL}/plato/buscar/${id}/`);
+    const res = await fetch(`${API}/buscar/${id}/`);
     if (!res.ok) throw new Error("No se pudo obtener el plato");
     return await res.json();
 };
 
 export const crearPlato = async (plato) => {
-    const res = await fetch(`${API_URL}/plato/guardar/`, {
+    const res = await fetch(`${API}/guardar/`, {
         method: "POST",
         headers: getHeaders(),
         body: JSON.stringify(plato),
@@ -26,7 +26,7 @@ export const crearPlato = async (plato) => {
 };
 
 export const actualizarPlato = async (id, plato) => {
-    const res = await fetch(`${API_URL}/plato/actualizar/${id}/`, {
+    const res = await fetch(`${API}/actualizar/${id}/`, {
         method: "PUT",
         headers: getHeaders(),
         body: JSON.stringify(plato),
@@ -39,7 +39,7 @@ export const actualizarPlato = async (id, plato) => {
 };
 
 export const eliminarPlato = async (id) => {
-    await fetch(`${API_URL}/plato/eliminar/${id}/`, {
+    await fetch(`${API}/eliminar/${id}/`, {
         method: "DELETE",
         headers: getHeaders(),
     });

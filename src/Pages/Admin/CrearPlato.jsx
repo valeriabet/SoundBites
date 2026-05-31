@@ -1,6 +1,6 @@
 ﻿import { useEffect, useState } from "react";
 import { crearPlato } from "../../Services/platoService";
-import { listarCategorias } from "../../Services/categoriaService";
+const API_CATEGORIAS = import.meta.env.VITE_API_URL + "/api/categoria/listar/";
 
 const CrearPlato = () => {
     const [categorias, setCategorias] = useState([]);
@@ -13,7 +13,8 @@ const CrearPlato = () => {
     useEffect(() => {
         const cargarCategorias = async () => {
             try {
-                const data = await listarCategorias();
+                const res = await fetch(API_CATEGORIAS);
+                const data = await res.json();
                 setCategorias(data);
             } catch (error) { console.error(error); }
         };

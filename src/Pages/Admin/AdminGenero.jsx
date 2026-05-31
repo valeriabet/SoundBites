@@ -38,14 +38,14 @@ const AdminGenero = () => {
     const eliminar = async (id) => {
         try {
             await eliminarGenero(id);
-            setGeneros((prev) => prev.filter((g) => g.id !== id));
+            setGeneros((prev) => prev.filter((g) => g.id_genero !== id));
         } catch (err) { console.error(err); }
     };
 
     const editar = (g) => {
         setNombre(g.nombre);
         setDescripcion(g.descripcion);
-        setEditandoId(g.id);
+        setEditandoId(g.id_genero);
     };
 
     return (
@@ -64,14 +64,14 @@ const AdminGenero = () => {
                 </div>
                 <div className="space-y-3">
                     {generos.map((g) => (
-                        <div key={g.id} className="bg-white p-4 rounded-xl shadow flex justify-between items-center">
+                        <div key={g.id_genero} className="bg-white p-4 rounded-xl shadow flex justify-between items-center">
                             <div>
                                 <div className="font-medium text-lg">{g.nombre}</div>
                                 <div className="text-sm text-gray-500">Votos: <span className="font-semibold">{g.votos ?? 0}</span></div>
                             </div>
                             <div className="flex gap-2">
                                 <button onClick={() => editar(g)} className="bg-yellow-400 px-3 py-1 rounded">Editar</button>
-                                <button onClick={() => eliminar(g.id)} className="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
+                                <button onClick={() => eliminar(g.id_genero)} className="bg-red-500 text-white px-3 py-1 rounded">Eliminar</button>
                             </div>
                         </div>
                     ))}
