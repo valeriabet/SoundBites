@@ -18,9 +18,16 @@ const fmt = (n) =>
         minimumFractionDigits: 0,
     }).format(n);
 
+const normalizeId = (val) => {
+    if (val && typeof val === "object") {
+        return val.id_usuario ?? val.id_plato ?? val.id ?? null;
+    }
+    return val;
+};
+
 const TarjetaPlato = ({ plato, visible, favoritos, toggleFavorito }) => {
     const [hover, setHover] = useState(false);
-    const esFavorito = favoritos.some((f) => f.id_plato === plato.id_plato);
+    const esFavorito = favoritos.some((f) => normalizeId(f.id_plato) === plato.id_plato);
 
     return (
         <article
@@ -95,8 +102,9 @@ const SeccionPlatos = () => {
             try {
                 const data = await listarFavoritos();
                 if (!Array.isArray(data)) return;
+                // Filtrar favoritos del usuario actual, normalizando FK
                 const favoritosUsuario = data.filter(
-                    (f) => f.id_usuario === usuario.id_usuario
+                    (f) => normalizeId(f.id_usuario) === usuario.id_usuario
                 );
                 setFavoritos(favoritosUsuario);
             } catch (error) {
@@ -105,14 +113,16 @@ const SeccionPlatos = () => {
         };
         cargarFavoritos();
     }, []);
+
     // TOGGLE FAVORITO
     const toggleFavorito = async (id_plato) => {
         if (!usuario) { alert("Debes iniciar sesión"); return; }
-        const existe = favoritos.find((f) => f.id_plato === id_plato);
+        const existe = favoritos.find((f) => normalizeId(f.id_plato) === id_plato);
         try {
             if (existe) {
-                await eliminarFavorito(existe.id);
-                setFavoritos(favoritos.filter((f) => f.id !== existe.id));
+
+                await eliminarFavorito(existe.id_favorito);
+                setFavoritos(favoritos.filter((f) => f.id_favorito !== existe.id_favorito));
             } else {
                 const nuevo = await guardarFavorito({
                     id_usuario: usuario.id_usuario,
@@ -125,10 +135,10 @@ const SeccionPlatos = () => {
         }
     };
 
-    // FILTRAR
+    // FILTRAR — normalizar id_categoria que puede venir como objeto FK
     const platosFiltrados = categoriaActiva === 0
         ? platos
-        : platos.filter((p) => p.id_categoria === categoriaActiva);
+        : platos.filter((p) => normalizeId(p.id_categoria) === categoriaActiva);
 
     // ANIMACIONES
     useEffect(() => {
