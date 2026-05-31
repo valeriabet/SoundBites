@@ -1,73 +1,72 @@
-# SoundBites
+# Sistema de Restaurante
 
-## Descripción
-Este proyecto consiste en una aplicación desarrollada en .NET C# y React que permite gestionar un sistema de restaurante mediante una API REST y una interfaz web.
-El sistema permite administrar usuarios, géneros, categorías, platos, favoritos y votos, aplicando los principios de la programación orientada a objetos (POO) y una arquitectura de API RESTful.
+##  Descripción
+
+Este proyecto consiste en una aplicación desarrollada en Python que permite gestionar un sistema de restaurante mediante una interfaz de consola.
+
+El sistema permite administrar usuarios, incluyendo registro, búsqueda, eliminación e inicio de sesión, aplicando los principios de la programación orientada a objetos (POO).
+
+---
 
 ## Objetivo
-Desarrollar una aplicación web que implemente una API REST con .NET C# como backend y React como frontend, permitiendo la gestión de diferentes entidades del sistema a través de endpoints y una interfaz de usuario moderna.
+
+Desarrollar una aplicación en Python que implemente los principios de la programación orientada a objetos, permitiendo la gestión de diferentes entidades del sistema a través de un menú interactivo en consola.
+
+---
 
 ## Funcionalidades
 
 ### Gestión de usuarios
-- Registrar usuario
-- Listar usuarios
-- Buscar usuario por ID
-- Actualizar usuario
-- Eliminar usuario
-- Iniciar sesión
 
-### Gestión de géneros
-- Registrar género
-- Listar géneros
-- Buscar género por ID
-- Actualizar género
-- Eliminar género
-
-### Gestión de categorías
-- Registrar categoría
-- Listar categorías
-- Buscar categoría por ID
-- Actualizar categoría
-- Eliminar categoría
+* Registrar usuario
+* Listar usuarios
+* Buscar usuario por correo
+* Eliminar usuario
+* Iniciar sesión
 
 ### Gestión de platos
-- Registrar plato
-- Listar platos
-- Buscar plato por ID
-- Actualizar plato
-- Eliminar plato
 
-### Gestión de favoritos
-- Agregar favorito
-- Listar favoritos
-- Buscar favorito por ID
-- Eliminar favorito
+* (En desarrollo)
 
-### Gestión de votos
-- Registrar voto
-- Listar votos
-- Buscar voto por ID
-- Eliminar voto
+###  Gestión de categorías
+
+* (En desarrollo)
+
+---
 
 ## 🖥️ Uso del sistema
-Al ejecutar el proyecto, el backend estará disponible a través de Swagger donde se pueden probar todos los endpoints. El frontend en React permite a los usuarios registrarse e iniciar sesión para interactuar con el sistema.
+
+Al ejecutar el programa, se mostrará un menú principal desde donde se puede acceder a:
+
+* Gestión de usuarios
+* Gestión de platos
+* Gestión de categorías
+
+Cada módulo contiene opciones para realizar operaciones básicas como crear, listar, buscar y eliminar.
+
+---
 
 ## Estado del proyecto
-Proyecto en desarrollo correspondiente a la fase de desarrollo de la API REST y conexión con el frontend.
+
+Proyecto en desarrollo correspondiente a la Fase 1 (Modelado con Programación Orientada a Objetos).
+
+---
 
 ## 👥 Integrantes
-- **Astrid Valeria Betancourt**: Backend y API
-- **Kevin Andres Castrillon**: Lógica de negocio e IA
-- **Samuel Sierra Rocha**: Cliente en consola, documentación y pruebas
+
+* Astrid Valeria Betancourt: Backend y API 
+* Kevin Andres Castrillon: Lógica de negocio e IA
+* Samuel Sierra Rocha: Cliente en consola, documentación y pruebas
+
+---
 
 ## Tecnologías utilizadas
-- .NET C# (ASP.NET Core Web API)
-- Dapper
-- SQL Server
-- React
-- Tailwind CSS
-- Vite
+
+* Python 3
+* Programación Orientada a Objetos (POO)
+
+---
 
 ## Documento de Diseño
-- https://canon-flute-79056857.figma.site/
+
+* https://canon-flute-79056857.figma.site/

@@ -1,0 +1,43 @@
+name: SoundBites CI
+
+on:
+  push:
+    branches:
+      - main
+      - Backend
+      - Frontend
+
+  pull_request:
+    branches:
+      - main
+      - Backend
+      - Frontend
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Clonar repositorio
+        uses: actions/checkout@v4
+
+      - name: Configurar Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Instalar dependencias
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Verificar cliente.py
+        run: python -m py_compile cliente.py
+
+      - name: Verificar recomendador.py
+        run: python -m py_compile recomendador.py
+
+      - name: Verificar main.py
+        run: python -m py_compile main.py
