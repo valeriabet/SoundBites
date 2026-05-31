@@ -1,13 +1,14 @@
 from pathlib import Path
 from datetime import timedelta
+from decouple import config
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-SECRET_KEY = 'django-insecure-soundbites-2026-cambiar-en-produccion'
+SECRET_KEY = config('SECRET_KEY', default='django-insecure-soundbites-2026-cambiar-en-produccion')
 
-DEBUG = True
+DEBUG = config('DEBUG', default=True, cast=bool)
 
-ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = config('ALLOWED_HOSTS', default='*').split(',')
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -68,7 +69,6 @@ USE_I18N = True
 USE_TZ = False
 
 STATIC_URL = 'static/'
-
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 REST_FRAMEWORK = {
@@ -79,18 +79,6 @@ REST_FRAMEWORK = {
         'rest_framework.permissions.IsAuthenticated',
     ),
 }
-SIMPLE_JWT = {
-    'ACCESS_TOKEN_LIFETIME': timedelta(hours=8),
-    'REFRESH_TOKEN_LIFETIME': timedelta(days=1),
-    'AUTH_HEADER_TYPES': ('Bearer',),
-}
-
-CORS_ALLOWED_ORIGINS = [
-    'http://localhost:5173',
-    'http://localhost:3000',
-]
-
-CORS_ALLOW_CREDENTIALS = True
 
 
 SIMPLE_JWT = {
@@ -100,3 +88,10 @@ SIMPLE_JWT = {
     'USER_ID_FIELD': 'id_usuario',
     'USER_ID_CLAIM': 'id_usuario',
 }
+
+CORS_ALLOWED_ORIGINS = [
+    'http://localhost:5173',
+    'http://localhost:3000',
+]
+
+CORS_ALLOW_CREDENTIALS = True

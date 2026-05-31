@@ -17,7 +17,14 @@ class Plato(models.Model):
     nombre = models.CharField(max_length=100)
     descripcion = models.CharField(max_length=200, null=True, blank=True)
     precio = models.DecimalField(max_digits=10, decimal_places=2)
-    id_categoria = models.IntegerField()
+    id_categoria = models.ForeignKey(
+        Categoria,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_categoria',
+        related_name='platos'
+    )
     imagen = models.CharField(max_length=300, null=True, blank=True)
 
     class Meta:
@@ -40,8 +47,7 @@ class Genero(models.Model):
 
     @property
     def votos_count(self):
-        """Contar votos de este género"""
-        return self.voto_set.count()
+        return self.votos.count()
 
 
 class Usuario(models.Model):
@@ -78,8 +84,18 @@ class Usuario(models.Model):
 
 class Favorito(models.Model):
     id_favorito = models.AutoField(primary_key=True)
-    id_usuario = models.IntegerField()
-    id_plato = models.IntegerField()
+    id_usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='favoritos'
+    )
+    id_plato = models.ForeignKey(
+        Plato,
+        on_delete=models.CASCADE,
+        db_column='id_plato',
+        related_name='favoritos'
+    )
     fecha_agregado = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:
@@ -97,12 +113,24 @@ class Reserva(models.Model):
         ('cancelada', 'Cancelada'),
         ('completada', 'Completada'),
     ]
-    
+
     id_reserva = models.AutoField(primary_key=True)
-    id_usuario = models.IntegerField()
+    id_usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='reservas'
+    )
     fecha = models.DateTimeField(null=True, blank=True)
     numero_personas = models.IntegerField()
-    id_genero = models.IntegerField()
+    id_genero = models.ForeignKey(
+        Genero,
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        db_column='id_genero',
+        related_name='reservas'
+    )
     estado = models.CharField(
         max_length=20,
         choices=ESTADO_CHOICES,
@@ -119,8 +147,18 @@ class Reserva(models.Model):
 
 class Voto(models.Model):
     id_voto = models.AutoField(primary_key=True)
-    id_usuario = models.IntegerField()
-    id_genero = models.IntegerField()
+    id_usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        db_column='id_usuario',
+        related_name='votos'
+    )
+    id_genero = models.ForeignKey(
+        Genero,
+        on_delete=models.CASCADE,
+        db_column='id_genero',
+        related_name='votos'
+    )
     fecha = models.DateTimeField(auto_now_add=True, null=True, blank=True)
 
     class Meta:

@@ -1,174 +1,179 @@
-from fastapi import FastAPI
+"""
+Microservicio IA — SoundBites
+Algoritmo: K-Nearest Neighbors (cosine similarity) sobre matriz usuario-plato de favoritos.
+
+Cómo correrlo:
+    pip install fastapi uvicorn requests pandas scikit-learn
+    uvicorn main:app --port 8001 --reload
+
+Requiere que el backend Django esté corriendo en http://localhost:8000
+"""
+
+import os
 import requests
 import pandas as pd
+from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sklearn.neighbors import NearestNeighbors
+
+# ── Configuración
+DJANGO_URL  = os.getenv("DJANGO_URL",  "http://localhost:8000/api")
+IA_USER     = os.getenv("IA_USER",     "admin@soundbites.com")   
+IA_PASSWORD = os.getenv("IA_PASSWORD", "admin1234")             
+N_NEIGHBORS = int(os.getenv("N_NEIGHBORS", "3"))                 
 
 app = FastAPI(
     title="SoundBites IA",
     description="Microservicio de recomendaciones de platos",
-    version="1.0"
+    version="1.0.0",
 )
 
-BASE_URL = "http://127.0.0.1:8000/api"
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["http://localhost:5173", "http://localhost:3000"],
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
-def login():
-    response = requests.post(
-        f"{BASE_URL}/auth/login/",
-        json={
-            "correo": "valeria@soundbites.com",
-            "contrasena": "123456"
-        }
+# ── Helpers
+def obtener_token() -> str:
+    """Obtiene un token JWT del backend Django."""
+    res = requests.post(
+        f"{DJANGO_URL}/auth/login/",
+        json={"correo": IA_USER, "contrasena": IA_PASSWORD},
+        timeout=10,
     )
+    if res.status_code != 200:
+        raise RuntimeError(f"No se pudo autenticar con Django: {res.text}")
+    return res.json()["tokens"]["access"]
 
-    data = response.json()
-    return data["tokens"]["access"]
 
-
-def obtener_favoritos(token):
-    headers = {
-        "Authorization": f"Bearer {token}"
-    }
-
-    response = requests.get(
-        f"{BASE_URL}/favorito/listar/",
-        headers=headers
+def obtener_datos(token: str, endpoint: str) -> list:
+    """Llama a un endpoint de Django con autenticación."""
+    res = requests.get(
+        f"{DJANGO_URL}{endpoint}",
+        headers={"Authorization": f"Bearer {token}"},
+        timeout=10,
     )
-
-    return response.json()
-
-
-def obtener_platos():
-    response = requests.get(
-        f"{BASE_URL}/plato/listar/"
-    )
-
-    return response.json()
+    res.raise_for_status()
+    return res.json()
 
 
-def crear_matriz(favoritos):
-    datos = []
-
-    for favorito in favoritos:
-        datos.append({
-            "usuario": favorito["id_usuario"],
-            "plato": favorito["id_plato"],
-            "valor": 1
-        })
-
-    df = pd.DataFrame(datos)
-
-    if df.empty:
+def crear_matriz(favoritos: list) -> pd.DataFrame:
+    """
+    Construye la matriz usuario-plato.
+    Filas = id_usuario, Columnas = id_plato, Valor = 1 si es favorito, 0 si no.
+    """
+    if not favoritos:
         return pd.DataFrame()
 
-    return df.pivot_table(
-        index="usuario",
-        columns="plato",
-        values="valor",
-        fill_value=0
+    df = pd.DataFrame(favoritos)
+
+   
+    if df["id_usuario"].dtype == object:
+        df["id_usuario"] = df["id_usuario"].apply(
+            lambda x: x["id_usuario"] if isinstance(x, dict) else x
+        )
+    if df["id_plato"].dtype == object:
+        df["id_plato"] = df["id_plato"].apply(
+            lambda x: x["id_plato"] if isinstance(x, dict) else x
+        )
+
+    matriz = df.pivot_table(
+        index="id_usuario",
+        columns="id_plato",
+        aggfunc=lambda x: 1,
+        fill_value=0,
     )
+    return matriz
 
 
+# ── Endpoints
 @app.get("/")
 def inicio():
-    return {
-        "mensaje": "Microservicio IA SoundBites funcionando"
-    }
-
-
-# 🔥 NUEVO ENDPOINT PARA FRONTEND
-@app.get("/api/recomendaciones")
-def recomendaciones_simple():
-    """
-    Endpoint simple para el frontend (evita 404)
-    """
-    return [
-        {
-            "nombre": "Pizza recomendada",
-            "descripcion": "Alta popularidad entre usuarios similares"
-        },
-        {
-            "nombre": "Hamburguesa especial",
-            "descripcion": "Basada en comportamiento de usuarios"
-        },
-        {
-            "nombre": "Pasta gourmet",
-            "descripcion": "Recomendada por IA básica"
-        }
-    ]
+    return {"mensaje": "Microservicio IA SoundBites funcionando"}
 
 
 @app.get("/recomendar/{id_usuario}")
 def recomendar(id_usuario: int):
+    # 1. Autenticarse con Django
+    try:
+        token = obtener_token()
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Error de autenticación: {str(e)}")
 
-    token = login()
-    favoritos = obtener_favoritos(token)
-    platos = obtener_platos()
+    # 2. Traer favoritos y platos
+    try:
+        favoritos = obtener_datos(token, "/favorito/listar/")
+        platos    = obtener_datos(token, "/plato/listar/")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail=f"Error comunicándose con Django: {str(e)}")
 
+    if not favoritos:
+        return {"recomendaciones": [], "mensaje": "No hay favoritos registrados aún."}
+
+    # 3. Construir matriz
     matriz = crear_matriz(favoritos)
 
-    if matriz.empty or id_usuario not in matriz.index:
+    if matriz.empty:
+        return {"recomendaciones": [], "mensaje": "No se pudo construir la matriz de favoritos."}
+
+    # 4. Verificar que el usuario existe en la matriz
+    if id_usuario not in matriz.index:
         return {
-            "error": "Usuario no encontrado o sin datos suficientes"
+            "recomendaciones": [],
+            "mensaje": "El usuario aún no tiene favoritos. ¡Agrega algunos platos favoritos para recibir recomendaciones!",
         }
 
-    modelo = NearestNeighbors(
-        metric="cosine",
-        algorithm="brute"
-    )
+    # 5. Ajustar n_neighbors según usuarios disponibles (KNN necesita al menos 2)
+    n_usuarios = len(matriz)
+    if n_usuarios < 2:
+        return {
+            "recomendaciones": [],
+            "mensaje": "Se necesitan al menos 2 usuarios con favoritos para generar recomendaciones.",
+        }
 
-    modelo.fit(matriz)
+    k = min(N_NEIGHBORS + 1, n_usuarios)  
 
-    indice_usuario = list(matriz.index).index(id_usuario)
+    # 6. Entrenar KNN
+    modelo = NearestNeighbors(n_neighbors=k, metric="cosine", algorithm="brute")
+    modelo.fit(matriz.values)
 
-    distancias, indices = modelo.kneighbors(
-        [matriz.iloc[indice_usuario]],
-        n_neighbors=4
-    )
+    # 7. Encontrar usuarios similares
+    indice_usuario = matriz.index.get_loc(id_usuario)
+    _, indices = modelo.kneighbors([matriz.values[indice_usuario]])
 
-    usuarios_similares = indices[0][1:]
+    usuarios_similares = [
+        matriz.index[i] for i in indices[0] if matriz.index[i] != id_usuario
+    ]
 
+    # 8. Platos que ya tiene el usuario como favoritos
     favoritos_usuario = set(
-        matriz.columns[
-            matriz.loc[id_usuario] > 0
-        ]
+        col for col in matriz.columns if matriz.loc[id_usuario, col] == 1
     )
 
-    recomendaciones = set()
-
-    for indice in usuarios_similares:
-
-        usuario_similar = matriz.index[indice]
-
+    # 9. Recopilar platos de usuarios similares que el usuario no tiene
+    platos_recomendados_ids = set()
+    for uid in usuarios_similares:
         favoritos_similar = set(
-            matriz.columns[
-                matriz.loc[usuario_similar] > 0
-            ]
+            col for col in matriz.columns if matriz.loc[uid, col] == 1
         )
+        platos_recomendados_ids |= favoritos_similar - favoritos_usuario
 
-        recomendaciones.update(
-            favoritos_similar - favoritos_usuario
-        )
+    if not platos_recomendados_ids:
+        return {
+            "recomendaciones": [],
+            "mensaje": "Ya tienes los mismos favoritos que los usuarios más similares a ti. ¡Sigue explorando!",
+        }
 
-    resultado = []
+    # 10. Enriquecer con datos completos del plato
+    platos_map = {p["id_plato"]: p for p in platos}
+    resultado = [
+        platos_map[pid]
+        for pid in platos_recomendados_ids
+        if pid in platos_map
+    ]
 
-    for plato_id in recomendaciones:
-
-        plato = next(
-            (
-                p for p in platos
-                if p["id_plato"] == plato_id
-            ),
-            None
-        )
-
-        if plato:
-            resultado.append(plato["nombre"])
-
-    return {
-        "usuario": id_usuario,
-        "recomendaciones": resultado[:5]
-    }
-    
-if __name__ == "__main__":
-    menu()
+    return {"recomendaciones": resultado}

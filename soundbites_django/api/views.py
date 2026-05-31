@@ -25,7 +25,7 @@ def get_tokens_for_user(usuario):
     }
 
 
-# ── AUTH ──────────────────────────────────────
+# ── AUTH
 @api_view(['POST'])
 @permission_classes([AllowAny])
 def registro(request):
@@ -81,7 +81,6 @@ def login(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def perfil_usuario(request):
-    """Obtener el perfil del usuario autenticado"""
     try:
         id_usuario = request.auth.get('id_usuario')
         usuario = Usuario.objects.get(pk=id_usuario)
@@ -90,7 +89,7 @@ def perfil_usuario(request):
         return Response({'error': 'Usuario no encontrado'}, status=404)
 
 
-# ── USUARIOS ──────────────────────────────────
+# ── USUARIOS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_usuarios(request):
@@ -139,7 +138,7 @@ def eliminar_usuario(request, id):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── CATEGORÍAS ────────────────────────────────
+# ── CATEGORÍAS 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_categorias(request):
@@ -193,20 +192,20 @@ def eliminar_categoria(request, id):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── PLATOS ────────────────────────────────────
+# ── PLATOS 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_platos(request):
-    return Response(
-        PlatoSerializer(Plato.objects.all(), many=True).data
-    )
+    platos = Plato.objects.select_related('id_categoria').all()
+    return Response(PlatoSerializer(platos, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def buscar_plato(request, id):
     try:
-        return Response(PlatoSerializer(Plato.objects.get(pk=id)).data)
+        plato = Plato.objects.select_related('id_categoria').get(pk=id)
+        return Response(PlatoSerializer(plato).data)
     except Plato.DoesNotExist:
         return Response({'error': 'No encontrado'}, status=404)
 
@@ -245,14 +244,12 @@ def eliminar_plato(request, id):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── GÉNEROS ───────────────────────────────────
+# ── GÉNEROS
 @api_view(['GET'])
 @permission_classes([AllowAny])
 def listar_generos(request):
-    generos = Genero.objects.all()
-    return Response(
-        GeneroSerializer(generos, many=True).data
-    )
+    generos = Genero.objects.prefetch_related('votos').all()
+    return Response(GeneroSerializer(generos, many=True).data)
 
 
 @api_view(['GET'])
@@ -300,20 +297,18 @@ def eliminar_genero(request, id):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── FAVORITOS ─────────────────────────────────
+# ── FAVORITOS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_favoritos(request):
-    return Response(
-        FavoritoSerializer(Favorito.objects.all(), many=True).data
-    )
+    favoritos = Favorito.objects.select_related('id_usuario', 'id_plato__id_categoria').all()
+    return Response(FavoritoSerializer(favoritos, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def favoritos_usuario(request, id_usuario):
-    """Obtener favoritos de un usuario específico"""
-    favoritos = Favorito.objects.filter(id_usuario=id_usuario)
+    favoritos = Favorito.objects.select_related('id_usuario', 'id_plato__id_categoria').filter(id_usuario=id_usuario)
     return Response(FavoritoSerializer(favoritos, many=True).data)
 
 
@@ -321,9 +316,8 @@ def favoritos_usuario(request, id_usuario):
 @permission_classes([IsAuthenticated])
 def buscar_favorito(request, id):
     try:
-        return Response(
-            FavoritoSerializer(Favorito.objects.get(pk=id)).data
-        )
+        favorito = Favorito.objects.select_related('id_usuario', 'id_plato__id_categoria').get(pk=id)
+        return Response(FavoritoSerializer(favorito).data)
     except Favorito.DoesNotExist:
         return Response({'error': 'No encontrado'}, status=404)
 
@@ -333,7 +327,6 @@ def buscar_favorito(request, id):
 def guardar_favorito(request):
     s = FavoritoSerializer(data=request.data)
     if s.is_valid():
-        # Verificar si ya existe
         if Favorito.objects.filter(
             id_usuario=request.data.get('id_usuario'),
             id_plato=request.data.get('id_plato')
@@ -350,7 +343,6 @@ def guardar_favorito(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def es_favorito(request, id_usuario, id_plato):
-    """Verificar si un plato es favorito del usuario"""
     existe = Favorito.objects.filter(
         id_usuario=id_usuario,
         id_plato=id_plato
@@ -371,7 +363,6 @@ def eliminar_favorito(request, id):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def eliminar_favorito_usuario_plato(request, id_usuario, id_plato):
-    """Eliminar un favorito específico del usuario"""
     try:
         fav = Favorito.objects.get(id_usuario=id_usuario, id_plato=id_plato)
         fav.delete()
@@ -380,20 +371,18 @@ def eliminar_favorito_usuario_plato(request, id_usuario, id_plato):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── RESERVAS ──────────────────────────────────
+# ── RESERVAS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_reservas(request):
-    return Response(
-        ReservaSerializer(Reserva.objects.all(), many=True).data
-    )
+    reservas = Reserva.objects.select_related('id_usuario', 'id_genero').all()
+    return Response(ReservaSerializer(reservas, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def reservas_usuario(request, id_usuario):
-    """Obtener reservas de un usuario específico"""
-    reservas = Reserva.objects.filter(id_usuario=id_usuario)
+    reservas = Reserva.objects.select_related('id_usuario', 'id_genero').filter(id_usuario=id_usuario)
     return Response(ReservaSerializer(reservas, many=True).data)
 
 
@@ -401,9 +390,8 @@ def reservas_usuario(request, id_usuario):
 @permission_classes([IsAuthenticated])
 def buscar_reserva(request, id):
     try:
-        return Response(
-            ReservaSerializer(Reserva.objects.get(pk=id)).data
-        )
+        reserva = Reserva.objects.select_related('id_usuario', 'id_genero').get(pk=id)
+        return Response(ReservaSerializer(reserva).data)
     except Reserva.DoesNotExist:
         return Response({'error': 'No encontrado'}, status=404)
 
@@ -421,7 +409,6 @@ def guardar_reserva(request):
 @api_view(['PUT'])
 @permission_classes([IsAuthenticated])
 def actualizar_reserva(request, id):
-    """Actualizar una reserva (estado, notas, etc)"""
     try:
         reserva = Reserva.objects.get(pk=id)
     except Reserva.DoesNotExist:
@@ -443,28 +430,25 @@ def eliminar_reserva(request, id):
         return Response({'error': 'No encontrado'}, status=404)
 
 
-# ── VOTOS ─────────────────────────────────────
+# ── VOTOS
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def listar_votos(request):
-    return Response(
-        VotoSerializer(Voto.objects.all(), many=True).data
-    )
+    votos = Voto.objects.select_related('id_usuario', 'id_genero').all()
+    return Response(VotoSerializer(votos, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def votos_usuario(request, id_usuario):
-    """Obtener votos de un usuario específico"""
-    votos = Voto.objects.filter(id_usuario=id_usuario)
+    votos = Voto.objects.select_related('id_usuario', 'id_genero').filter(id_usuario=id_usuario)
     return Response(VotoSerializer(votos, many=True).data)
 
 
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def votos_genero(request, id_genero):
-    """Obtener todos los votos de un género"""
-    votos = Voto.objects.filter(id_genero=id_genero)
+    votos = Voto.objects.select_related('id_usuario', 'id_genero').filter(id_genero=id_genero)
     return Response(VotoSerializer(votos, many=True).data)
 
 
@@ -472,9 +456,8 @@ def votos_genero(request, id_genero):
 @permission_classes([IsAuthenticated])
 def buscar_voto(request, id):
     try:
-        return Response(
-            VotoSerializer(Voto.objects.get(pk=id)).data
-        )
+        voto = Voto.objects.select_related('id_usuario', 'id_genero').get(pk=id)
+        return Response(VotoSerializer(voto).data)
     except Voto.DoesNotExist:
         return Response({'error': 'No encontrado'}, status=404)
 
@@ -482,17 +465,15 @@ def buscar_voto(request, id):
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
 def guardar_voto(request):
-    """Crear un voto (evitar duplicados)"""
     id_usuario = request.data.get('id_usuario')
     id_genero = request.data.get('id_genero')
-    
-    # Verificar si ya votó
+
     if Voto.objects.filter(id_usuario=id_usuario, id_genero=id_genero).exists():
         return Response(
             {'error': 'Ya has votado por este género'},
             status=400
         )
-    
+
     s = VotoSerializer(data=request.data)
     if s.is_valid():
         s.save()
@@ -513,7 +494,6 @@ def eliminar_voto(request, id):
 @api_view(['DELETE'])
 @permission_classes([IsAuthenticated])
 def eliminar_voto_usuario_genero(request, id_usuario, id_genero):
-    """Eliminar el voto de un usuario en un género"""
     try:
         voto = Voto.objects.get(id_usuario=id_usuario, id_genero=id_genero)
         voto.delete()

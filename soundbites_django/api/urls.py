@@ -42,8 +42,8 @@ urlpatterns = [
     path('favorito/buscar/<int:id>/', views.buscar_favorito),
     path('favorito/es-favorito/<int:id_usuario>/<int:id_plato>/', views.es_favorito),
     path('favorito/guardar/', views.guardar_favorito),
-    path('favorito/eliminar/<int:id>/', views.eliminar_favorito),
-    path('favorito/eliminar/<int:id_usuario>/<int:id_plato>/', views.eliminar_favorito_usuario_plato),
+    path('favorito/eliminar/por-id/<int:id>/', views.eliminar_favorito),
+    path('favorito/eliminar/por-usuario/<int:id_usuario>/<int:id_plato>/', views.eliminar_favorito_usuario_plato),
 
     # Reservas
     path('reserva/listar/', views.listar_reservas),
@@ -59,6 +59,6 @@ urlpatterns = [
     path('voto/genero/<int:id_genero>/', views.votos_genero),
     path('voto/buscar/<int:id>/', views.buscar_voto),
     path('voto/guardar/', views.guardar_voto),
-    path('voto/eliminar/<int:id>/', views.eliminar_voto),
-    path('voto/eliminar/<int:id_usuario>/<int:id_genero>/', views.eliminar_voto_usuario_genero),
+    path('voto/eliminar/por-id/<int:id>/', views.eliminar_voto),
+    path('voto/eliminar/por-usuario/<int:id_usuario>/<int:id_genero>/', views.eliminar_voto_usuario_genero),
 ]
